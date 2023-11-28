@@ -1,0 +1,253 @@
+<%- include('../partials/adminHeader') %>
+<style>
+  .card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-header {
+    background-color: #f8f9fa;
+  }
+
+  .fixed-image-preview {
+    margin-top: 20px;
+  }
+
+  .preview-image {
+    max-width: 100%;
+    max-height: 200px;
+  }
+</style>
+
+<div class="details" style="margin-left: 200px;">
+  <div class="recentOrders">
+    <div class="container mt-5">
+      <!-- Card for Product Details -->
+      <div class="card bg-white">
+        <div class="card-header">
+          <form class="row g-3" method="POST" action="/admin/addproduct" enctype="multipart/form-data">
+            <h2>Add Products</h2>
+            <!-- Product Details Fields -->
+            <div class="col-md-6">
+              <label for="inputEmail4" class="form-label">Product Name</label>
+              <input class="form-control" name="productname" id="inputEmail4" required>
+            </div>
+            <div class="col-md-6">
+              <label for="inputEmail4" class="form-label">Colour</label>
+              <input class="form-control" name="colour" id="inputEmail4" required>
+            </div>
+            <div class="col-md-6">
+              <label for="brand" class="form-label">Brand</label>
+              <select id="brand" name="brand" class="form-select">
+                <option>SPECMEN</option>
+                <option>H&M</option>
+                <option>ZARA</option>
+                <!-- Add your brand options here -->
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="inputCity" class="form-label">Price</label>
+              <input type="number" class="form-control" name="price" id="inputCity" required min="0">
+            </div>
+            <div class="col-md-6">
+              <label for="inputCity" class="form-label">Stock</label>
+              <input type="number" class="form-control" name="stock" id="stock" required min="0">
+            </div>
+            <div class="col-md-12">
+              <label for="inputState" class="form-label">Category</label>
+              <select id="inputState" name="category" class="form-select">
+                <% categories.forEach(category => { %>
+                  <option value="<%= category._id %>"><%= category.categoryname %></option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card for Sizes -->
+      <div class="col-md-12 mt-5">
+        <div class="card bg-white shadow">
+          <div class="card-header">
+            <h2>Product Sizes</h2>
+            <button class="btn btn-dark" id="addSizeBtn">Add Size</button>
+            <div class="row" id="sizeFieldsContainer">
+              <!-- Size Fields will be dynamically added here -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Card for Highlights and Image Upload -->
+      <div class="row mt-5">
+        <!-- Card for Highlights -->
+        <div class="col-md-6">
+          <div class="card bg-white">
+            <div class="card-header">
+              <h2>Product Highlights</h2>
+              <div class="col-md-12">
+                <label for="inputSpec1" class="form-label">Highlights 1</label>
+                <input class="form-control" name="Spec1" id="spec">
+              </div>
+              <div class="col-md-12">
+                <label for="inputSpec2" class="form-label">Highlights 2</label>
+                <input class="form-control" name="Spec2" id="spec">
+              </div>
+              <div class="col-md-12">
+                <label for="inputSpec3" class="form-label">Highlights 3</label>
+                <input class="form-control" name="Spec3" id="spec">
+              </div>
+              <div class="col-md-12">
+                <label for="inputSpec4" class="form-label">Highlights 4</label>
+                <input class="form-control" name="Spec4" id="spec">
+              </div>
+              <div class="d-flex justify-content-around">
+                <div class="cardHeader d-flex">
+                  <button type="submit" class="btn btn-dark">Add product</button>
+                </div>
+                <div class="cardHeader d-flex">
+                  <a href="/admin/products" class="btn">Cancel</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card for Image Upload -->
+        <div class="col-md-6">
+          <div class="card bg-white">
+            <div class="card-header">
+              <h2>Product Images</h2>
+              <div class="col-md-6">
+                <label for="productImage1" class="form-label">Image 1</label>
+                <input type="file" class="form-control" name="productImages" accept="image/*" id="productImage1">
+              </div>
+              <div class="col-md-6">
+                <label for="productImage2" class="form-label">Image 2</label>
+                <input type="file" class="form-control" name="image1" accept="image/*" id="productImage2">
+              </div>
+              <div class="col-md-6">
+                <label for="productImage3" class="form-label">Image 3</label>
+                <input type="file" class="form-control" name="image2" accept="image/*" id="productImage3">
+              </div>
+              <div class="col-md-6">
+                <label for="productImage4" class="form-label">Image 4</label>
+                <input type="file" class="form-control" name="image3" accept="image/*" id="productImage4">
+              </div>
+              <div class="col-md-6">
+                <label for="productImage4" class="form-label">Image 5</label>
+                <input type="file" class="form-control" name="image4" accept="image/*" id="productImage5">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fixed Image Preview -->
+      <div class="fixed-image-preview mt-5">
+        <div id="imagePreview1" style="width: 100px; height: 100px;"></div>
+        <br>
+        <br>
+        <div id="imagePreview2" style="width: 100px; height: 100px;"></div>
+        <br>
+        <br>
+        <div id="imagePreview3" style="width: 100px; height: 100px;"></div>
+        <br>
+        <br>
+        <div id="imagePreview4" style="width: 100px; height: 100px;"></div>
+        <br>
+        <br>
+        <div id="imagePreview5" style="width: 100px; height: 100px;"></div>
+        <br>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('addSizeBtn').addEventListener('click', function (event) {
+    // Prevent the default form submission behavior
+    event.preventDefault();
+
+    const sizeFieldsContainer = document.getElementById('sizeFieldsContainer');
+
+    // Create a new size field container
+    const newSizeField = document.createElement('div');
+    newSizeField.className = 'col-md-4';
+
+    // Create the label for the size field
+    const sizeLabel = document.createElement('label');
+    sizeLabel.className = 'form-label';
+    sizeLabel.textContent = 'Size';
+
+    // Create the select element for the size options
+    const sizeSelect = document.createElement('select');
+    sizeSelect.className = 'form-select';
+    sizeSelect.name = 'sizes[]';
+    
+    // Add options to the select element
+    const sizeOptions = ['S', 'M', 'L', 'XL'];
+    sizeOptions.forEach(sizeOption => {
+      const option = document.createElement('option');
+      option.value = sizeOption;
+      option.textContent = sizeOption;
+      sizeSelect.appendChild(option);
+    });
+
+    // Create the "Remove" button
+    const removeButton = document.createElement('button');
+    removeButton.className = 'btn btn-danger';
+    removeButton.textContent = 'Remove';
+    removeButton.addEventListener('click', function () {
+      // Remove the size field container when the "Remove" button is clicked
+      sizeFieldsContainer.removeChild(newSizeField);
+    });
+
+    // Append label, select, and remove button to the size field container
+    newSizeField.appendChild(sizeLabel);
+    newSizeField.appendChild(sizeSelect);
+    newSizeField.appendChild(removeButton);
+
+    // Append the new size field container to the sizeFieldsContainer
+    sizeFieldsContainer.appendChild(newSizeField);
+  });
+
+  function updateImagePreview(inputId, previewId) {
+    const imagePreview = document.getElementById(previewId);
+    const input = document.getElementById(inputId);
+
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.classList.add('preview-image');
+        img.style.width = '368px';
+        img.style.height = '416px';
+        imagePreview.innerHTML = '';
+        imagePreview.appendChild(img);
+      };
+
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      imagePreview.innerHTML = '';
+    }
+  }
+
+  document.getElementById('productImage1').addEventListener('change', function () {
+    updateImagePreview('productImage1', 'imagePreview1');
+  });
+  document.getElementById('productImage2').addEventListener('change', function () {
+    updateImagePreview('productImage2', 'imagePreview2');
+  });
+  document.getElementById('productImage3').addEventListener('change', function () {
+    updateImagePreview('productImage3', 'imagePreview3');
+  });
+  document.getElementById('productImage4').addEventListener('change', function () {
+    updateImagePreview('productImage4', 'imagePreview4');
+  });
+  document.getElementById('productImage5').addEventListener('change', function () {
+    updateImagePreview('productImage5', 'imagePreview5');
+  });
+</script>
+<%- include('../partials/adminFooter')%>

@@ -1,0 +1,118 @@
+<%- include('../partials/adminHeader')%>
+
+<style>
+    .card-with-shadow {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px; /* Adjust as needed */
+        width: 80%; /* Adjust the width as needed */
+        margin: 0 auto; /* Center the card */
+        margin-top: 60px;
+        margin-left: 240px;
+    }
+
+    .card-with-shadow::before,
+    .card-with-shadow::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 10px;
+        height: 100%;
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.1), transparent);
+    }
+
+    .card-with-shadow::after {
+        right: 0;
+        left: auto;
+        background: linear-gradient(to left, rgba(0, 0, 0, 0.1), transparent);
+    }
+
+    .card-body table {
+        width: 100%;
+    }
+
+    .card-body table th,
+    .card-body table td {
+        text-align: center;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .img-column img {
+        max-width: 73px;
+        height: 73px;
+    }
+
+    .btn-add-category {
+        background-color: white;
+        color: black;
+        border: 1px solid black;
+    }
+</style>
+
+
+<div class="card card-with-shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><h3>Category management</h3></span>
+        <a href="/admin/addCategory"><button class="btn btn-add-category">
+            <i class="fas fa-plus"></i> Add Category
+        </button></a>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Category name</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Edit</th>
+                    <th scope="col">Archive</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% categoryData.forEach((data)=> { %>
+                <tr>
+                      
+                    <td><%=++i %></td>
+                    <td><%=data.categoryname %></td>
+                    <td>  <%=data.date %></td>
+                    <td class="img-column"><img src="/uploadedImages/<%=data.image %>" alt="Image 1"></td>
+                    <td>
+                        <a href="/admin/editCategory/<%= data._id %>"><button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editCategoryModal">
+                            <i class="fas fa-edit" style="color: black;"></i> Edit
+                        </button></a>
+                    </td>
+                    <td>
+                        <form action="/admin/deleteCategory/<%= data._id %>" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt" style="color: white;"></i> Delete
+                            </button>
+                        </form>
+                </tr>
+                <% }) %>
+             
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<%- include('../partials/adminFooter')%>
