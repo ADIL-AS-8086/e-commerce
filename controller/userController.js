@@ -3,6 +3,8 @@ const OTP = require('../model/otpSchema');
 const { sendOTP } = require("../util/otp");
 const bcrypt = require('bcrypt');
 const Category = require('../model/categorySchema');
+const Product= require('../model/prodectSchema')
+
 
 let _email;
 let _password;
@@ -12,11 +14,13 @@ let _name;
 
 const home = async (req, res) => {
   try {
-    // Fetch categories
-    const categories = await Category.find().limit(3);
+   
+    const categories = await Category.find();
+    const proctData= await Product.find().limit(8);
+
 
     res.render('./user/home', {
-      category: categories,  // Update the variable name here
+      category: categories,proctData
     });
   } catch (error) {
     console.error(error);
@@ -24,11 +28,23 @@ const home = async (req, res) => {
   }
 };
 
-
+const userHome=async (req,res)=>{
+  try {
+    const categories = await Category.find();
+    const proctData= await Product.find().limit(8);
+    res.render('./user/homeuser', {
+      category: categories,proctData 
+    });
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+}
 
 
 const loginpage = (req, res) => {
-  res.render('./user/signin');
+  res.render('./user/signin',{message:false});
 };
 const signuppage = (req, res) => {
   res.render('./user/signup');
@@ -55,7 +71,7 @@ const signup = async (req, res) => {
     const otpInfo = await sendOTP(email);
 
     try {
-      // Try to insert OTP document
+      
       await OTP.create({
         email: email,
         otp: otpInfo.otp,
@@ -64,7 +80,7 @@ const signup = async (req, res) => {
       res.render('./user/otpuser', { email: email,message:false });
     } catch (error) {
       if (error.code === 11000 && error.keyValue && error.keyPattern) {
-        // Duplicate key error, update existing OTP
+        
         console.log('Duplicate key error:', error.keyValue);
 
         await OTP.updateOne(
@@ -75,7 +91,7 @@ const signup = async (req, res) => {
 
         res.render('./user/otpuser', { email: email ,message:false});
       } else {
-        // Handle other errors
+   
         console.error('Error during OTP insertion:', error);
         res.render('./user/signup', { message: 'Error during signup' });
       }
@@ -102,30 +118,32 @@ const verifyOTP = async (req, res) => {
     const { email, otp } = req.body;
     console.log(email, otp, '..................................................................');
 
-    // Find the OTP in the database
+    
     const otpData = await OTP.findOne({ email: email, otp: otp, isExpired: false });
     console.log('-----------', otpData);
     if (otpData) {
-      // Mark the OTP as expired
+     
       otpData.isExpired = true;
       await otpData.save();
       console.log('otp saved.............');
 
-      // Continue with user registration or any other action
+     
       try {
-        // Insert user data into the User schema
+        
         await user.create({
           username: _name,
           email: _email,
           password: _password,
+    
+
         });
 
-        // Set user session to true
+        
         req.session.username = _name;
         req.session.email = _email;
         req.session.userlogged = true;
 
-        res.redirect('/'); // Redirect to home or any other page
+        res.redirect('/user/user-home'); 
       } catch (error) {
         console.error('Error during user data insertion:', error);
         return res.render('./user/otpuser', { email: _email, message: 'Error during user data insertion' });
@@ -150,41 +168,89 @@ const verifyOTP = async (req, res) => {
 
 
 
-
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log(".........", email, password);
+    
     const userFound = await user.findOne({ email: email });
     console.log(userFound);
 
     if (!userFound) {
-      res.render('./user/signin', { message: 'Invalid email or password' });
+      
+      return res.render('./user/signin', { message: 'Invalid email or password' });
+    }
+
+    
+    if (!userFound.status) {
+      
+      return res.render('./user/signin', { message: 'Admin blocked your account' });
+    }
+    if (password === userFound.password) {
+      console.log(userFound.email);
+     
+      req.session.email = userFound.email;
+      req.session.userlogged = true;
+
+      return res.redirect('/user/user-home');
     } else {
-      const isPasswordValid = await bcrypt.compare(password, userFound.password);
-      console.log("..........,pass valid");
-
-      if (isPasswordValid) {
-        // Password is correct
-        req.session.username = userFound.username;
-        req.session.email = userFound.email;
-        req.session.userlogged = true;
-
-        res.redirect('./user/home');
-      } else {
-        // Password is incorrect
-        res.render('./user/signin', { message: 'Invalid email or password' });
-      }
+      return res.render('./user/signin', { message: 'Invalid email or password' });
     }
   } catch (error) {
     console.error("Error during login:", error);
-    res.render('./user/signin', { message: 'Error during login' });
+    return res.render('./user/signin', { message: 'Error during login' });
   }
 };
+
 
 const otppage = (req, res) => {
   res.render('./user/otpuser');
 };
+
+
+const shoppage =async (req, res) => {
+  try {
+      const proctData =await Product.find({}).exec()
+      console.log('........................................................:', proctData);
+      res.render('./user/shop', { proctData });
+  } catch (error) {
+      console.error('Error:', error,'..............................................');
+      res.status(500).send('Internal Server Error');
+  }
+}
+
+
+
+
+const productdetailpage =async(req,res)=>{
+  try {
+    console.log('adilsdfghjklttttttttttttttttttttttttttttttttttttttttttttttttttt');
+    const id=req.params.id
+    const productData=await Product.findOne({_id:id})
+    console.log('mmmmmmmmmm',productData);
+    
+
+res.render('./user/productdetail',{productData})
+
+
+    
+  } catch (error) {
+    console.log(error)
+    
+  }
+}
+
+
+const logOut=async(req,res)=>{
+  try {
+    req.session.userlogged = false;
+    res.redirect('/user/login')
+  } catch (error) {
+    console.error('error while logout:',error)
+  }
+}
+
+
 
 module.exports = {
   home,
@@ -193,5 +259,9 @@ module.exports = {
   signup,
   login,
   otppage,
-  verifyOTP
+  verifyOTP,
+  shoppage,
+  userHome,
+  productdetailpage,
+  logOut
 };

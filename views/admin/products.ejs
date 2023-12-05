@@ -1,5 +1,22 @@
 <%- include('../partials/adminHeader')%>
 
+<style>
+
+  .table-bordered th,
+  .table-bordered td {
+    border: 1px solid #dee2e6;
+  }
+
+  .table-bordered tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .size-quantity-separator {
+    border-right: 1px solid #000000;
+    padding-right: 10px;
+  }
+</style>
+
 <div class="container mt-5" style="margin-left: 240px; max-width: 1000px;">
   <div class="card bg-white shadow">
     <div class="card-header">
@@ -13,52 +30,68 @@
       </div>
     </div>
     <div class="card-body">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">NO</th>
-            <th scope="col">Product</th>
-            <th scope="col">Category</th>
-            <th scope="col">Stock</th>
-            <th scope="col">Price</th>
-            <th scope="col">Brand</th>
-            <th scope="col">Edit</th>
-            <th scope="col">Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-  <!-- Inside the loop for displaying products -->
-<% for (let i = 0; i < productData.length; i++) { %>
-  <tr>
-    <th scope="row"><%= i + 1 %></th>
-    <td>
-      <!-- Display product image and name -->
-      <% if (productData[i].images && productData[i].images.length > 0 && productData[i].images[0]) { %>
-        <img src="/productimages/<%= productData[i].images[0].filename %>" alt="Product Image" style="max-width: 50px; max-height: 60px; margin-right: 10px;">
-      <% } %>
-      <%= productData[i].name %>
-    </td>
-    <td><%= productData[i].categoryId?.categoryname %></td> 
-    <td><%= productData[i].stock %></td>
-    <td>$<%= productData[i].price %></td>
-    <td><%= productData[i].brand %></td>
-    <td>
-   <a href="/admin/editproduct">
-      <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal">
-        <i class="fas fa-edit" style="color: #000;"></i>
-      </button></a>
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">NO</th>
+              <th scope="col">Product</th>
+              <th scope="col">Category</th>
+              <th scope="col">Stock by Size/Quantity</th>
+              <th scope="col">Price</th>
+              <th scope="col">Brand</th>
+              <th scope="col">Edit</th>
+              <th scope="col">status</th>
+              <th scope="col">Delete</th>
+            </tr>
+          </thead>
+          <tbody>
 
-    </td>
-    <td>
-      <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#deleteProductModal">
-        <i class="fas fa-trash" style="color: #000;"></i>
-      </button>
-    </td>
-  </tr>
-<% } %>
+            <% for (let i = 0; i < productData.length; i++) { %>
+              <tr class="<%= i % 2 === 0 ? 'even' : 'odd' %>">
+                <th scope="row"><%= i + 1 %></th>
+                <td>
 
-        </tbody>
-      </table>
+                  <% if (productData[i].images && productData[i].images.length > 0 && productData[i].images[0]) { %>
+                    <img src="/productimages/<%= productData[i].images[0].filename %>" alt="Product Image" class="img-fluid" style="max-width: 50px; max-height: 60px; margin-right: 10px;">
+                  <% } %>
+                  <%= productData[i].name %>
+                </td>
+                <td><%= productData[i].categoryId?.categoryname %></td>
+                <td>
+          
+                  <% for (let j = 0; j < productData[i].variant.length; j++) { %>
+                    <span style="font-weight: bold;" class="size-quantity-separator"><%= productData[i].variant[j].size %></span>
+                    <span style="color: #007BFF;"><%= productData[i].variant[j].quantity %></span><br>
+                  <% } %>
+                </td>
+                <td><%= productData[i].price %></td>
+                <td><%= productData[i].brand %></td>
+                <td>
+                  <a href="/admin/editproduct/<%= productData[i]._id %>">
+                    Edit <i class="fa fa-edit"></i>
+                  </a>
+                </td>
+                
+
+                <td><%= productData[i].Status ? 'Active' : 'Blocked' %></td>
+                <td>
+
+              
+
+                  <a href="/admin/blockproduct/<%= productData[i]._id %>" onclick="return confirm('Do you want delete  <%= productData[i].CategoryName %> ?')">
+                   <i class="fas fa-ban" style="color: #000;"></i>Block</a>
+                  
+
+            
+        
+                
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

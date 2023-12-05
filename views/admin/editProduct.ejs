@@ -1,232 +1,317 @@
 <%- include('../partials/adminHeader') %>
+
+
 <style>
-  .card {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  .product-text-container {
+    border-radius: 12px;
+    width: 100%;
+    height: 56px;
+    margin-left: 300px;
+    margin-top: 73px;
+    box-shadow: 0px 0px 7px -3px;
+  }
+  .error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
   }
 
-  .card-header {
-    background-color: #f8f9fa;
-  }
-
-  .fixed-image-preview {
-    margin-top: 20px;
-  }
-
-  .preview-image {
-    max-width: 100%;
-    max-height: 200px;
+  #form {
+    border: 2px;
+    margin-left: 300px;
+    padding-left: 200px;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 7px -3px;
   }
 </style>
 
-<div class="details" style="margin-left: 200px;">
-  <div class="recentOrders">
-    <div class="container mt-5">
-      <!-- Card for Product Details -->
-      <div class="card bg-white">
-        <div class="card-header">
-            <form class="row g-3" method="POST" action="/admin/editproduct/<%= productData._id %>" enctype="multipart/form-data">
-                <h2>Edit Product</h2>
-            <!-- Product Details Fields -->
-            <div class="col-md-6">
-              <label for="productname" class="form-label">Product Name</label>
-              <input class="form-control" name="productname" id="productname" value="<%= productData.name %>" required>
-            </div>
-            <div class="col-md-6">
-              <label for="colour" class="form-label">Colour</label>
-              <input class="form-control" name="colour" id="colour" value="<%= productData.colour %>" required>
-            </div>
-            <div class="col-md-6">
-              <label for="brand" class="form-label">Brand</label>
-              <select id="brand" name="brand" class="form-select">
-                <option value="SPECMEN" <%= productData.brand === 'SPECMEN' ? 'selected' : '' %>>SPECMEN</option>
-                <option value="H&M" <%= productData.brand === 'H&M' ? 'selected' : '' %>>H&M</option>
-                <option value="ZARA" <%= productData.brand === 'ZARA' ? 'selected' : '' %>>ZARA</option>
-                <!-- Add your brand options here -->
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label for="price" class="form-label">Price</label>
-              <input type="number" class="form-control" name="price" id="price" value="<%= productData.price %>" required min="0">
-            </div>
-            <div class="col-md-6">
-              <label for="stock" class="form-label">Stock</label>
-              <input type="number" class="form-control" name="stock" id="stock" value="<%= productData.stock %>" required min="0">
-            </div>
-            <div class="col-md-12">
-              <label for="category" class="form-label">Category</label>
-              <select id="category" name="category" class="form-select">
-                <% categories.forEach(category => { %>
-                  <option value="<%= category._id %>" <%= productData.categoryId.toString() === category._id.toString() ? 'selected' : '' %>><%= category.categoryname %></option>
-                <% }); %>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
+<!-- Bootstrap form with grid layout -->
+<form action="/admin//editproduct/<%=productData.id %>" method="POST" id="form" enctype="multipart/form-data">
 
-      <!-- Card for Sizes -->
-      <div class="col-md-12 mt-5">
-        <div class="card bg-white shadow">
-          <div class="card-header">
-            <h2>Product Sizes</h2>
-            <div class="row" id="sizeFieldsContainer">
-              <!-- Size Fields will be dynamically added here -->
-              <% productData.sizes.forEach((size, index) => { %>
-                <div class="col-md-4">
-                  <label for="size<%= index + 1 %>" class="form-label">Size <%= index + 1 %></label>
-                  <select class="form-select" id="size<%= index + 1 %>" name="sizes[]">
-                    <option value="S" <%= size === 'S' ? 'selected' : '' %>>S</option>
-                    <option value="M" <%= size === 'M' ? 'selected' : '' %>>M</option>
-                    <option value="L" <%= size === 'L' ? 'selected' : '' %>>L</option>
-                    <option value="XL" <%= size === 'XL' ? 'selected' : '' %>>XL</option>
-                  </select>
-                </div>
-              <% }); %>
-            </div>
-            <button class="btn btn-dark" id="addSizeBtn">Add Size</button>
-          </div>
-        </div>
-      </div>
+  <!-- Product Information Card -->
+  <div class="card bg-white mb-4">
+    <div class="card-header">
+      <h2>Product Information</h2>
 
-      <!-- Card for Highlights and Image Upload -->
-      <div class="row mt-5">
-        <!-- Card for Highlights -->
+
+      <h6>EDIT Product</h6>
+    </div>
+
         <div class="col-md-6">
-          <div class="card bg-white">
-            <div class="card-header">
-              <h2>Product Highlights</h2>
-              <div class="col-md-12">
-                <label for="Spec1" class="form-label">Highlights 1</label>
-                <input class="form-control" name="Spec1" id="Spec1" value="<%= productData.highlight1 %>">
-              </div>
-              <div class="col-md-12">
-                <label for="Spec2" class="form-label">Highlights 2</label>
-                <input class="form-control" name="Spec2" id="Spec2" value="<%= productData.highlight2 %>">
-              </div>
-              <div class="col-md-12">
-                <label for="Spec3" class="form-label">Highlights 3</label>
-                <input class="form-control" name="Spec3" id="Spec3" value="<%= productData.highlight3 %>">
-              </div>
-              <div class="col-md-12">
-                <label for="Spec4" class="form-label">Highlights 4</label>
-                <input class="form-control" name="Spec4" id="Spec4" value="<%= productData.highlight4 %>">
-              </div>
-              <div class="d-flex justify-content-around">
-                <div class="cardHeader d-flex">
-                  <button type="submit" class="btn btn-dark">Update Product</button>
-                </div>
-                <div class="cardHeader d-flex">
-                  <a href="/admin/products" class="btn">Cancel</a>
-                </div>
-              </div>
-            </div>
-          </div>
+          <label for="productName" class="form-label">Product Name</label>
+          <input type="text" class="form-control" id="productName" value="<%= productData.name %>" name="productname" placeholder="Product name" required>
+          <div id="productNameError" class="error-message"></div>
         </div>
-
-        <!-- Card for Image Upload -->
         <div class="col-md-6">
-          <div class="card bg-white">
-            <div class="card-header">
-              <h2>Product Images</h2>
-              <% productData.images.forEach((image, index) => { %>
-                <div class="col-md-6">
-                  <label for="productImage<%= index + 1 %>" class="form-label">Image <%= index + 1 %></label>
-                  <input type="file" class="form-control" name="productImages" accept="image/*" id="productImage<%= index + 1 %>">
-                  <div id="imagePreview<%= index + 1 %>" style="width: 100px; height: 100px;"></div>
-                </div>
-              <% }); %>
-              <!-- Add more file input fields if needed -->
-            </div>
-          </div>
+          <label for="productPrice" class="form-label">Price</label>
+          <input type="number" class="form-control" id="productPrice" value="<%=productData.price %>" name="price" placeholder="Price" required min="1">
+          <div id="productPriceError" class="error-message"></div>
         </div>
       </div>
 
-      <!-- Fixed Image Preview -->
-      <div class="fixed-image-preview mt-5">
-        <% for (let i = 1; i <= productData.images.length; i++) { %>
-          <div id="imagePreview<%= i %>" style="width: 100px; height: 100px;"></div>
-          <br>
-          <br>
-          <script>
-            document.getElementById('productImage<%= i %>').addEventListener('change', function () {
-              updateImagePreview('productImage<%= i %>', 'imagePreview<%= i %>');
-            });
-          </script>
-        <% } %>
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label for="productColor" class="form-label">Colour</label>
+          <input type="text" class="form-control" id="productColor" value="<%=productData.colour %>" name="colour" placeholder="Colour">
+        </div>
+        <div class="col-md-6">
+          <label for="brand" class="form-label">Brand</label>
+          <select id="brand" name="brand" class="form-select">
+            <option value="SPECMEN" <%= productData.brand === 'SPECMEN' ? 'selected' : '' %>>SPECMEN</option>
+            <option value="H&M" <%= productData.brand === 'H&M' ? 'selected' : '' %>>H&M</option>
+            <option value="ZARA" <%= productData.brand === 'ZARA' ? 'selected' : '' %>>ZARA</option>
+            <!-- Add your brand options here -->
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="category" class="form-label">Category</label>
+          <select class="form-select form-select-input form-select-sm shadow-none" name="category" id="category" aria-label=".form-select-sm example">
+            <% categories.forEach(category => { %>
+              <option value="<%= category._id %>" <%= (selectedCategory && selectedCategory._id.toString() === category._id.toString()) ? 'selected' : '' %>>
+                <%= category.categoryname %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+    
+
+  <!-- Variants Card -->
+  <div class="card bg-white mb-4">
+    <div class="card-header">
+      <h2>Variants</h2>
+    </div>
+    <div class="card-body">
+      <div class="row mb-4">
+        <!-- Add Variant Button -->
+        <div class="col-md-12 d-flex justify-content-center">
+          <button type="button" class="btn btn-primary" id="addVariant">Add Variant</button>
+        </div>
+      </div>
+
+      <!-- Size and Quantity Section -->
+      <div id="variantSection">
+        <!-- Variant Template -->
+        <% productData.variant.forEach((variant,index)=> { %>
+        <div class="variant-row row mb-4" data-variant-index="<%=index %>">
+          <div class="col-md-6">
+            <label for="productSize" class="form-label">Size</label>
+            <input type="text" class="form-control" name="variant[size][]" value="<%=variant.size%>" placeholder="Size">
+          </div>
+          <div class="col-md-6">
+            <label for="productStock" class="form-label">Stock Quantity</label>
+            <input type="number" class="form-control" name="variant[quantity][]" value="<%=variant.quantity %>" placeholder="Stock" required min="1">
+
+            <div class="variant-error-message error-message"></div>
+          </div>
+          <!-- Remove Variant Icon -->
+          <div class="col-md-12 mt-2 d-flex justify-content-end">
+            <!-- Ensure at least one variant is always present -->
+            <button type="button" class="btn btn-danger" onclick="removeVariant(this)">&times;</button>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+
+
+         
+<div class="row mt-5" style="margin-left: -10px; width: 600px; ">
+
+  <div class="col-md-6" style="width: 500px;">
+    <div class="card bg-white">
+      <div class="card-header">
+        <h2>Product Highlights</h2>
+        <div class="col-md-12">
+          <label for="Spec1" class="form-label">Highlights 1</label>
+          <input class="form-control" name="Spec1" id="Spec1" value="<%= productData.highlight1 %>">
+        </div>
+        <div class="col-md-12">
+          <label for="Spec2" class="form-label">Highlights 2</label>
+          <input class="form-control" name="Spec2" id="Spec2" value="<%= productData.highlight2 %>">
+        </div>
+        <div class="col-md-12">
+          <label for="Spec3" class="form-label">Highlights 3</label>
+          <input class="form-control" name="Spec3" id="Spec3" value="<%= productData.highlight3 %>">
+        </div>
+        <div class="col-md-12">
+          <label for="Spec4" class="form-label">Highlights 4</label>
+          <input class="form-control" name="Spec4" id="Spec4" value="<%= productData.highlight4 %>">
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-  document.getElementById('addSizeBtn').addEventListener('click', function (event) {
-    // Prevent the default form submission behavior
-    event.preventDefault();
+<button type="submit" class="btn btn-primary" style="width: 200px; margin-top: 100px;">update</button>
 
-    const sizeFieldsContainer = document.getElementById('sizeFieldsContainer');
+  <a href="/admin/products" class="btn btn-secondary" style="width: 200px; margin-top: 100px;">Cancel</a>
 
-    // Create a new size field container
-    const newSizeField = document.createElement('div');
-    newSizeField.className = 'col-md-4';
 
-    // Create the label for the size field
-    const sizeLabel = document.createElement('label');
-    sizeLabel.className = 'form-label';
-    sizeLabel.textContent = 'Size';
+  <div class="col-md-6" style="margin-left: 500px; width: 600px; margin-top: -480px;">
+    <div class="card bg-white">
+      <div class="card-header">
+        <h2>Product Images</h2>
+        <% for (let i = 0; i < productData.images.length; i++) { %>
+          <div class="col-md-6">
+            <label for="productImage<%= i + 1 %>" class="form-label">Image <%= i + 1 %></label>
+            <input type="file" class="form-control" name="productImages" accept="image/*" id="productImage<%= i + 1 %>" >
+  
+            <% if (productData.images[i]) { %>
+              <img src="/productimages/<%= productData.images[i].filename %>" alt="Product Image" class="preview-image" style="height: 100px; width: 100px;">
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
 
-    // Create the select element for the size options
-    const sizeSelect = document.createElement('select');
-    sizeSelect.className = 'form-select';
-    sizeSelect.name = 'sizes[]';
 
-    // Add options to the select element
-    const sizeOptions = ['S', 'M', 'L', 'XL'];
-    sizeOptions.forEach(sizeOption => {
-      const option = document.createElement('option');
-      option.value = sizeOption;
-      option.textContent = sizeOption;
-      sizeSelect.appendChild(option);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Submit Button -->
+
+      </form>
+
+
+
+      
+      <script>
+        document.getElementById('addVariant').addEventListener('click', function () {
+          // Clone the existing variant section and append it to the variantSection div
+          var index = document.querySelectorAll('#variantSection .variant-row').length;
+          var newVariantSection = document.querySelector('#variantSection .variant-row').cloneNode(true);
+  
+          // Update the variant index in the new variant section
+          newVariantSection.setAttribute('data-variant-index', index);
+  
+          // Enable the remove button in the new variant section
+          newVariantSection.querySelector('button').removeAttribute('disabled');
+  
+          // Clear input values in the new variant section
+          newVariantSection.querySelectorAll('input').forEach(input => {
+            input.value = '';
+          });
+  
+          document.getElementById('variantSection').appendChild(newVariantSection);
+        });
+  
+        function removeVariant(button) {
+          var variantSection = document.getElementById('variantSection');
+  
+          // Ensure at least one variant is always present
+          if (variantSection.querySelectorAll('.variant-row').length > 1) {
+            // Remove the parent row of the clicked button
+            button.closest('.variant-row').remove();
+          }
+        }
+
+
+
+        function validateForm() {
+    // Reset previous error messages
+    document.querySelectorAll('.error-message').forEach(element => {
+      element.textContent = '';
     });
 
-    // Create the "Remove" button
-    const removeButton = document.createElement('button');
-    removeButton.className = 'btn btn-danger';
-    removeButton.textContent = 'Remove';
-    removeButton.addEventListener('click', function () {
-      // Remove the size field container when the "Remove" button is clicked
-      sizeFieldsContainer.removeChild(newSizeField);
-    });
-
-    // Append label, select, and remove button to the size field container
-    newSizeField.appendChild(sizeLabel);
-    newSizeField.appendChild(sizeSelect);
-    newSizeField.appendChild(removeButton);
-
-    // Append the new size field container to the sizeFieldsContainer
-    sizeFieldsContainer.appendChild(newSizeField);
-  });
-
-  function updateImagePreview(inputId, previewId) {
-    const imagePreview = document.getElementById(previewId);
-    const input = document.getElementById(inputId);
-
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-
-      reader.onload = function (e) {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.classList.add('preview-image');
-        img.style.width = '368px';
-        img.style.height = '416px';
-        imagePreview.innerHTML = '';
-        imagePreview.appendChild(img);
-      };
-
-      reader.readAsDataURL(input.files[0]);
-    } else {
-      imagePreview.innerHTML = '';
+    // Validate Product Name
+    const productName = document.getElementById('productName').value;
+    if (productName.trim() === '') {
+      document.getElementById('productNameError').textContent = 'Product name cannot be blank';
+      return false;
     }
+
+    // Validate Price
+    const productPrice = document.getElementById('productPrice').value;
+    if (parseFloat(productPrice) <= 0 || isNaN(productPrice)) {
+      document.getElementById('productPriceError').textContent = 'Price must be greater than 0';
+      return false;
+    }
+
+    // Validate Variants (Size and Quantity)
+    const variantRows = document.querySelectorAll('.variant-row');
+    for (let i = 0; i < variantRows.length; i++) {
+      const size = variantRows[i].querySelector('[name="variant[size][]"]').value;
+      const quantity = variantRows[i].querySelector('[name="variant[quantity][]"]').value;
+
+      if (size.trim() === '' || isNaN(quantity) || parseInt(quantity) < 1) {
+        variantRows[i].querySelector('.variant-error-message').textContent = 'Invalid size or quantity';
+        return false;
+      }
+    }
+
+    // Additional validation for other fields if needed
+
+    return true; // Form is valid
   }
-</script>
+      </script>
+
+     
+      
+   
+  
+
 <%- include('../partials/adminFooter') %>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<
+
+
+
+
+
+
+
+
+<!-- 
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+<!-- 
+ -->

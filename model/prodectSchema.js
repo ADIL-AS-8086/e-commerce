@@ -12,15 +12,24 @@
     highlight2:{ type: String },
     highlight3:{ type: String },
     highlight4:{ type: String },
-    stock: { type: Number,min:0 },
+    variant: [{
+      size: {
+        type: String,   
+        required: true
+      },
+      quantity: {
+        type: Number,
+        required: true,
+      
+      }
+      }],
     timeStamp: { type: Date },
     images: {type:Array},
     colour: { type: String },
     brand: { type: String},
-    sizes: [{ type: String }], 
     categoryId: { type: Schema.Types.ObjectId , ref: 'Category'},
     isDeleted: { type: Boolean, default: false },
-    Status: { type: String, enum: ["active", "inactive"], default: "active" },
+    Status: { type: Boolean, default: true },
   },  { timestamps: true });
 
 

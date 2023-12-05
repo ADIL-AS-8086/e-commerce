@@ -20,9 +20,12 @@ const userSchema = new mongoose.Schema({
   },
   status: {
     type: Boolean,
-   // You can customize the status options
-    default: true, // Default status if not provided
+    default: true, 
   },
+  date: {
+    type: Date,
+    default: Date.now,
+  }
 });
 
 const User = mongoose.model('User', userSchema);

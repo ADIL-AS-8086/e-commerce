@@ -4,7 +4,8 @@ const category = require('../model/categorySchema')
 require('dotenv').config()
 
 
-//get method for category management
+const supportedFormats = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'image/tiff', 'image/avif'];
+
 
 const categoryListPage = async (req, res) => {
     var i = 0
@@ -12,35 +13,54 @@ const categoryListPage = async (req, res) => {
     res.render("./admin/CategoryList", { categoryData, i })
 }
 
-//get method for add category
+
 
 const    addCategorypage = (req, res) => {
-    res.render('./admin/addCategory')
+    res.render('./admin/addCategory',{ alertMessage: req.query.alertMessage || '' })
 }
-
-
-//post method for add category
 
 const addCategory = async (req, res) => {
-    console.log("..............");
     try {
-        const{name}=req.body
-        console.log(name);
-        const categoryName=name
-        const image = req.file.filename
-        console.log("aaaaaaaaaa",req.file)
+        const { name } = req.body;
+        const image = req.file ? req.file : undefined;
 
-            const newCategory = await category.create({
-                categoryname: categoryName,
-                image: image
-            })
-            console.log("catedddddddddddddddddddddddddddddgptu",newCategory);
-            res.redirect('/admin/catogeryList')
-        
+
+        if (image) {
+            if (!supportedFormats.includes(image.mimetype)) {
+               
+                const alertMessage = encodeURIComponent('Unsupported image format');
+                return res.redirect('/admin/addCategory?alertMessage=' + alertMessage);
+            }
+        } else {
+
+        }
+
+        const existingCategory = await category.findOne({
+            categoryname: { $regex: new RegExp('^' + name + '$', 'i') }
+        });
+
+        if (existingCategory) {
+     
+            const alertMessage = encodeURIComponent('Category name already exists');
+            return res.redirect('/admin/addCategory?alertMessage=' + alertMessage);
+        }
+
+   
+
+        const newCategory = await category.create({
+            categoryname: name,
+            image: image ? image.filename : undefined
+        });
+
+        console.log("Category added:", newCategory);
+        res.redirect('/admin/catogeryList');
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
-}
+};
+
+
 
 
 
@@ -48,26 +68,57 @@ const addCategory = async (req, res) => {
 
 const editCategory = async (req, res) => {
     const id = req.params.id;
-  
+
+    
     const categoryData = await category.findOne({ _id: id });
-    res.render('./admin/editCategory', { categoryData});
+
+  
+    const alertMessage = req.query.alertMessage || '';
+    const imageFormatError = req.query.imageFormatError || ''; 
+
+    res.render('./admin/editCategory', { categoryData, alertMessage, imageFormatError });
 };
+
+
+
+
 
 const afterEditCategory = async (req, res) => {
     try {
         const id = req.params.id;
         const { name } = req.body;
-        const newImage = req.file ? req.file.filename : undefined;
+        const newImage = req.file ? req.file : undefined;
+
+      
+        const existingCategory = await category.findOne({
+            categoryname: { $regex: new RegExp('^' + name + '$', 'i') },
+            _id: { $ne: id }
+        });
+
+        if (existingCategory) {
+            const alertMessage = encodeURIComponent('Category name already exists');
+            return res.redirect('/admin/editCategory/' + id + '?alertMessage=' + alertMessage);
+        }
+
+        if (newImage) {
+            const uploadedImage = newImage;
+
+            if (!supportedFormats.includes(uploadedImage.mimetype)) {
+                const alertMessage = encodeURIComponent('Unsupported image format ,provide valid image format   ');
+                return res.redirect('/admin/editCategory/' + id + '?alertMessage=' + alertMessage);
+            }
+
+        }
 
         const updatedCategory = await category.findByIdAndUpdate(
             id,
             {
                 $set: {
                     categoryname: name,
-                    image: newImage
+                    image: newImage ? newImage.filename : undefined
                 }
             },
-            { new: true } // Ensure to get the updated document
+            { new: true }
         );
 
         console.log(updatedCategory);
@@ -78,13 +129,11 @@ const afterEditCategory = async (req, res) => {
     }
 };
 
-
 const deleteCategory = async (req, res) => {
     try {
         const id = req.params.id;
 
-        // Find the category by ID and remove it
-
+  
         
         const deletedCategory = await category.findByIdAndDelete(id);
 
@@ -92,7 +141,7 @@ const deleteCategory = async (req, res) => {
             return res.status(404).send('Category not found');
         }
 
-        // Redirect to the admin category list
+       
         res.redirect('/admin/catogeryList');
     } catch (err) {
         console.error(err);

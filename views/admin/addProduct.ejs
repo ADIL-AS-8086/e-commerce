@@ -16,6 +16,14 @@
     max-width: 100%;
     max-height: 200px;
   }
+  .alert {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+  }
 </style>
 
 <div class="details" style="margin-left: 200px;">
@@ -28,12 +36,12 @@
             <h2>Add Products</h2>
             <!-- Product Details Fields -->
             <div class="col-md-6">
-              <label for="inputEmail4" class="form-label">Product Name</label>
-              <input class="form-control" name="productname" id="inputEmail4" required>
+              <label for="productname" class="form-label">Product Name</label>
+              <input class="form-control" name="productname" id="productname" required>
             </div>
             <div class="col-md-6">
-              <label for="inputEmail4" class="form-label">Colour</label>
-              <input class="form-control" name="colour" id="inputEmail4" required>
+              <label for="colour" class="form-label">Colour</label>
+              <input class="form-control" name="colour" id="colour" required>
             </div>
             <div class="col-md-6">
               <label for="brand" class="form-label">Brand</label>
@@ -45,172 +53,173 @@
               </select>
             </div>
             <div class="col-md-6">
-              <label for="inputCity" class="form-label">Price</label>
-              <input type="number" class="form-control" name="price" id="inputCity" required min="0">
+              <label for="price" class="form-label">Price</label>
+              <input type="number" class="form-control" name="price" id="price" required min="0">
             </div>
-            <div class="col-md-6">
-              <label for="inputCity" class="form-label">Stock</label>
-              <input type="number" class="form-control" name="stock" id="stock" required min="0">
-            </div>
-            <div class="col-md-12">
-              <label for="inputState" class="form-label">Category</label>
-              <select id="inputState" name="category" class="form-select">
-                <% categories.forEach(category => { %>
-                  <option value="<%= category._id %>"><%= category.categoryname %></option>
-                <% }); %>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Card for Sizes -->
-      <div class="col-md-12 mt-5">
-        <div class="card bg-white shadow">
-          <div class="card-header">
-            <h2>Product Sizes</h2>
-            <button class="btn btn-dark" id="addSizeBtn">Add Size</button>
-            <div class="row" id="sizeFieldsContainer">
-              <!-- Size Fields will be dynamically added here -->
+
+              <!-- Inside the form -->
+<div class="col-md-6">
+  <label for="category" class="form-label">Category</label>
+  <select id="category" name="category" class="form-select" required>
+    <% categories.forEach(category => { %>
+      <option value="<%= category._id %>"><%= category?.categoryname %></option>
+    <% }); %>
+  </select>
+</div>
+
+
+
+            <!-- Size and Quantity Section -->
+            <div class="row mb-4">
+              <!-- Add Variant Button -->
+              <div class="col-md-12 d-flex justify-content-center">
+                <button type="button" class="btn btn-primary" id="addVariant">Add Variant</button>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <!-- Card for Highlights and Image Upload -->
-      <div class="row mt-5">
-        <!-- Card for Highlights -->
-        <div class="col-md-6">
-          <div class="card bg-white">
-            <div class="card-header">
-              <h2>Product Highlights</h2>
-              <div class="col-md-12">
-                <label for="inputSpec1" class="form-label">Highlights 1</label>
-                <input class="form-control" name="Spec1" id="spec">
-              </div>
-              <div class="col-md-12">
-                <label for="inputSpec2" class="form-label">Highlights 2</label>
-                <input class="form-control" name="Spec2" id="spec">
-              </div>
-              <div class="col-md-12">
-                <label for="inputSpec3" class="form-label">Highlights 3</label>
-                <input class="form-control" name="Spec3" id="spec">
-              </div>
-              <div class="col-md-12">
-                <label for="inputSpec4" class="form-label">Highlights 4</label>
-                <input class="form-control" name="Spec4" id="spec">
-              </div>
-              <div class="d-flex justify-content-around">
-                <div class="cardHeader d-flex">
-                  <button type="submit" class="btn btn-dark">Add product</button>
+
+            <!-- Size and Color Section -->
+            <div id="variantSection">
+              <!-- Variant Template -->
+              <div class="variant-row row mb-4" data-variant-index="0">
+                <div class="col-md-6">
+                  <label for="productSize" class="form-label">Size</label>
+                  <input type="text" class="form-control" name="variant[size][]" placeholder="Size">
                 </div>
-                <div class="cardHeader d-flex">
-                  <a href="/admin/products" class="btn">Cancel</a>
+                <div class="col-md-6">
+                  <label for="productStock" class="form-label">Stock Quantity</label>
+                  <input type="number" class="form-control" name="variant[quantity][]" placeholder="Stock" required min="0">
+                </div>
+                <!-- Remove Variant Icon -->
+                <div class="col-md-12 mt-2 d-flex justify-content-end">
+                  <!-- Ensure at least one variant is always present -->
+                  <button type="button" class="btn btn-danger" onclick="removeVariant(this)" disabled>&times;</button>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Card for Image Upload -->
-        <div class="col-md-6">
-          <div class="card bg-white">
-            <div class="card-header">
-              <h2>Product Images</h2>
+            <!-- Image Upload Section -->
+            <div class="row mt-5">
+              <!-- Card for Highlights -->
               <div class="col-md-6">
-                <label for="productImage1" class="form-label">Image 1</label>
-                <input type="file" class="form-control" name="productImages" accept="image/*" id="productImage1">
+                <div class="card bg-white">
+                  <div class="card-header">
+                    <h2>Product Highlights</h2>
+                    <div class="col-md-12">
+                      <label for="inputSpec1" class="form-label">Highlights 1</label>
+                      <input class="form-control" name="Spec1" id="spec1">
+                    </div>
+                    <div class="col-md-12">
+                      <label for="inputSpec2" class="form-label">Highlights 2</label>
+                      <input class="form-control" name="Spec2" id="spec2">
+                    </div>
+                    <div class="col-md-12">
+                      <label for="inputSpec3" class="form-label">Highlights 3</label>
+                      <input class="form-control" name="Spec3" id="spec3">
+                    </div>
+                    <div class="col-md-12">
+                      <label for="inputSpec4" class="form-label">Highlights 4</label>
+                      <input class="form-control" name="Spec4" id="spec4">
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <!-- Card for Image Upload -->
               <div class="col-md-6">
-                <label for="productImage2" class="form-label">Image 2</label>
-                <input type="file" class="form-control" name="image1" accept="image/*" id="productImage2">
-              </div>
-              <div class="col-md-6">
-                <label for="productImage3" class="form-label">Image 3</label>
-                <input type="file" class="form-control" name="image2" accept="image/*" id="productImage3">
-              </div>
-              <div class="col-md-6">
-                <label for="productImage4" class="form-label">Image 4</label>
-                <input type="file" class="form-control" name="image3" accept="image/*" id="productImage4">
-              </div>
-              <div class="col-md-6">
-                <label for="productImage4" class="form-label">Image 5</label>
-                <input type="file" class="form-control" name="image4" accept="image/*" id="productImage5">
+                <div class="card bg-white">
+                  <div class="card-header">
+                    <h2>Product Images</h2>
+
+                    <!-- Image 1 -->
+                    <div class="col-md-6">
+                      <label for="productImage1" class="form-label">Image 1</label>
+                      <input type="file" class="form-control" name="productImages" accept="image/*" id="productImage1" onchange="updateImagePreview('productImage1', 'imagePreview1')" required>
+                      <!-- Image Preview -->
+                      <div id="imagePreview1" style="width: 100px; height: 100px;"></div>
+                    </div>
+
+                    <!-- Image 2 -->
+                    <div class="col-md-6">
+                      <label for="productImage2" class="form-label">Image 2</label>
+                      <input type="file" class="form-control" name="image1" accept="image/*" id="productImage2" onchange="updateImagePreview('productImage2', 'imagePreview2')" required>
+                      <!-- Image Preview -->
+                      <div id="imagePreview2" style="width: 100px; height: 100px;"></div>
+                    </div>
+
+                    <!-- Image 3 -->
+                    <div class="col-md-6">
+                      <label for="productImage3" class="form-label">Image 3</label>
+                      <input type="file" class="form-control" name="image2" accept="image/*" id="productImage3" onchange="updateImagePreview('productImage3', 'imagePreview3')" required>
+                      <!-- Image Preview -->
+                      <div id="imagePreview3" style="width: 100px; height: 100px;"></div>
+                    </div>
+
+                    <!-- Image 4 -->
+                    <div class="col-md-6">
+                      <label for="productImage4" class="form-label">Image 4</label>
+                      <input type="file" class="form-control" name="image3" accept="image/*" id="productImage4" onchange="updateImagePreview('productImage4', 'imagePreview4')">
+                      <!-- Image Preview -->
+                      <div id="imagePreview4" style="width: 100px; height: 100px;"></div>
+                    </div>
+
+                    <!-- Image 5 -->
+                    <div class="col-md-6">
+                      <label for="productImage5" class="form-label">Image 5</label>
+                      <input type="file" class="form-control" name="image4" accept="image/*" id="productImage5" onchange="updateImagePreview('productImage5', 'imagePreview5')">
+                      <!-- Image Preview -->
+                      <div id="imagePreview5" style="width: 100px; height: 100px;"></div>
+                    </div>
+                    <div class="d-flex justify-content-around mt-3">
+                      <div class="cardHeader d-flex">
+                        <button type="submit" class="btn btn-dark">Add Product</button>
+                      </div>
+                      <div class="cardHeader d-flex">
+                        <a href="/admin/products" class="btn btn-secondary">Cancel</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
               </div>
             </div>
-          </div>
-        </div>
-      </div>
+          
 
-      <!-- Fixed Image Preview -->
-      <div class="fixed-image-preview mt-5">
-        <div id="imagePreview1" style="width: 100px; height: 100px;"></div>
-        <br>
-        <br>
-        <div id="imagePreview2" style="width: 100px; height: 100px;"></div>
-        <br>
-        <br>
-        <div id="imagePreview3" style="width: 100px; height: 100px;"></div>
-        <br>
-        <br>
-        <div id="imagePreview4" style="width: 100px; height: 100px;"></div>
-        <br>
-        <br>
-        <div id="imagePreview5" style="width: 100px; height: 100px;"></div>
-        <br>
-        <br>
+            <!-- Fixed Image Preview -->
+            <div class="fixed-image-preview mt-5">
+              <div id="imagePreview1" style="width: 100px; height: 100px;"></div>
+              <br>
+              <br>
+              <div id="imagePreview2" style="width: 100px; height: 100px;"></div>
+              <br>
+              <br>
+              <div id="imagePreview3" style="width: 100px; height: 100px;"></div>
+              <br>
+              <br>
+              <div id="imagePreview4" style="width: 100px; height: 100px;"></div>
+              <br>
+              <br>
+              <div id="imagePreview5" style="width: 100px; height: 100px;"></div>
+              <br>
+              <br>
+
+
+
+
+
+            
+            </div>
+
+            <!-- Submit and Cancel Buttons -->
+           
+          </form>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  document.getElementById('addSizeBtn').addEventListener('click', function (event) {
-    // Prevent the default form submission behavior
-    event.preventDefault();
-
-    const sizeFieldsContainer = document.getElementById('sizeFieldsContainer');
-
-    // Create a new size field container
-    const newSizeField = document.createElement('div');
-    newSizeField.className = 'col-md-4';
-
-    // Create the label for the size field
-    const sizeLabel = document.createElement('label');
-    sizeLabel.className = 'form-label';
-    sizeLabel.textContent = 'Size';
-
-    // Create the select element for the size options
-    const sizeSelect = document.createElement('select');
-    sizeSelect.className = 'form-select';
-    sizeSelect.name = 'sizes[]';
-    
-    // Add options to the select element
-    const sizeOptions = ['S', 'M', 'L', 'XL'];
-    sizeOptions.forEach(sizeOption => {
-      const option = document.createElement('option');
-      option.value = sizeOption;
-      option.textContent = sizeOption;
-      sizeSelect.appendChild(option);
-    });
-
-    // Create the "Remove" button
-    const removeButton = document.createElement('button');
-    removeButton.className = 'btn btn-danger';
-    removeButton.textContent = 'Remove';
-    removeButton.addEventListener('click', function () {
-      // Remove the size field container when the "Remove" button is clicked
-      sizeFieldsContainer.removeChild(newSizeField);
-    });
-
-    // Append label, select, and remove button to the size field container
-    newSizeField.appendChild(sizeLabel);
-    newSizeField.appendChild(sizeSelect);
-    newSizeField.appendChild(removeButton);
-
-    // Append the new size field container to the sizeFieldsContainer
-    sizeFieldsContainer.appendChild(newSizeField);
-  });
-
   function updateImagePreview(inputId, previewId) {
     const imagePreview = document.getElementById(previewId);
     const input = document.getElementById(inputId);
@@ -222,8 +231,8 @@
         const img = document.createElement('img');
         img.src = e.target.result;
         img.classList.add('preview-image');
-        img.style.width = '368px';
-        img.style.height = '416px';
+        img.style.width = '100px';
+        img.style.height = '100px';
         imagePreview.innerHTML = '';
         imagePreview.appendChild(img);
       };
@@ -249,5 +258,133 @@
   document.getElementById('productImage5').addEventListener('change', function () {
     updateImagePreview('productImage5', 'imagePreview5');
   });
+
+  document.getElementById('addVariant').addEventListener('click', function () {
+    // Clone the existing variant section and append it to the variantSection div
+    var index = document.querySelectorAll('#variantSection .variant-row').length;
+    var newVariantSection = document.querySelector('#variantSection .variant-row').cloneNode(true);
+
+    // Update the variant index in the new variant section
+    newVariantSection.setAttribute('data-variant-index', index);
+
+    // Enable the remove button in the new variant section
+    newVariantSection.querySelector('button').removeAttribute('disabled');
+
+    document.getElementById('variantSection').appendChild(newVariantSection);
+  });
+
+  function removeVariant(button) {
+    var variantSection = document.getElementById('variantSection');
+
+    // Ensure at least one variant is always present
+    if (variantSection.querySelectorAll('.variant-row').length > 1) {
+      // Remove the parent row of the clicked button
+      button.closest('.variant-row').remove();
+    }
+  }
+
+
+  const errorMessage = '<%= errorMessage %>';
+
+if (errorMessage!==false) {
+  const productNameField = document.getElementById('productname');
+  const errorAlert = document.createElement('div');
+  errorAlert.classList.add('alert', 'alert-danger', 'mt-2');
+  errorAlert.textContent = errorMessage;
+  productNameField.parentNode.appendChild(errorAlert);
+
+  setTimeout(function () {
+      errorAlert.remove();
+    }, 4000);
+  }
+
+  
+
+
+
+
+  
+  
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); // Prevent form submission for now
+
+      // Validate Product Name
+      const productName = document.getElementById('productname').value.trim().toLowerCase();
+
+      // Check if product name contains "black" with spaces
+      if (productName === '' || productName.includes('black')) {
+        displayValidationMessage('Please enter a valid product name.');
+        return;
+      }
+
+      // Validate Colour
+      const colour = document.getElementById('colour').value.trim();
+
+      // Check if colour is a valid text (does not contain numbers)
+      if (colour === '' || /\d/.test(colour)) {
+        displayValidationMessage('Please enter a valid colour (text only, no numbers).');
+        return;
+      }
+
+      // Validate Price
+      const price = document.getElementById('price').value.trim();
+      if (price === '' || isNaN(price) || parseFloat(price) < 0) {
+        displayValidationMessage('Please enter a valid price (at least 0).');
+        return;
+      }
+
+      // Validate Variants
+      const variants = document.querySelectorAll('#variantSection .variant-row');
+      if (variants.length === 0) {
+        displayValidationMessage('Please add at least one variant.');
+        return;
+      }
+
+      for (const variant of variants) {
+        // Validate Size
+        const size = variant.querySelector('input[name="variant[size][]"]').value.trim();
+        if (size === '') {
+          displayValidationMessage('Please enter a valid size for all variants.');
+          return;
+        }
+
+        // Validate Quantity
+        const quantity = variant.querySelector('input[name="variant[quantity][]"]').value.trim();
+        if (quantity === '' || isNaN(quantity) || parseInt(quantity) < 0) {
+          displayValidationMessage('Please enter a valid quantity for all variants (at least 0).');
+          return;
+        }
+      }
+
+
+      // If all validations pass, submit the form
+      form.submit();
+    });
+
+    function displayValidationMessage(message) {
+      // Remove existing alert messages
+      const existingAlerts = document.querySelectorAll('.alert');
+      existingAlerts.forEach(alert => alert.remove());
+
+      // Create a div element for displaying the validation message
+      const validationMessage = document.createElement('div');
+      validationMessage.classList.add('alert', 'alert-danger', 'mt-3');
+      validationMessage.textContent = message;
+
+      // Append the message to the form
+      form.insertBefore(validationMessage, form.firstChild);
+
+      // Remove the message after 4 seconds
+      setTimeout(function () {
+        validationMessage.remove();
+      }, 4000);
+    }
+  });
+
+
 </script>
+
 <%- include('../partials/adminFooter')%>

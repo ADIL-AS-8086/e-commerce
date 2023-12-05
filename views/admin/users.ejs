@@ -135,42 +135,57 @@
                     <td>name</td>
                     <td>date</td>
                     <td class="header">status</td>
+                    <td>action</td>
                 </tr>
             </thead>
 
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>ADIL</td>
-                    <td>ASSSSSSS</td>
-                    <td>ASDF</td>
-                    <td class="status active">active</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>af@tgmail.com</td>
-                    <td>AF</td>
-                    <td>ASDF</td>
-                    <td class="status active">active</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>bf@tgmail.com</td>
-                    <td>BF</td>
-                    <td>ASDF</td>
-                    <td class="status active">active</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>cf@tgmail.com</td>
-                    <td>CF</td>
-                    <td>ASDF</td>
-                    <td class="status active">active</td>
-                </tr>
-                <!-- Add more rows if needed -->
+                <% userData.forEach((data)=>{ %>
+                    <tr>
+                      <td>
+                        <%=++i%>
+                      </td>
+                      <td>
+                        <%=data.username%>
+                      </td>
+                      <td>
+                        <%=data.email%>
+                      </td>
+                      <td>
+                        <% var dt = new Date(data.date); %>
+                        <%= dt.getDate() %>/<%= dt.getMonth() + 1 %>/<%= dt.getFullYear() %>
+                      </td>                      
+                      <td
+                        class="<%= data.status ? 'text-success fw-bold' : 'text-danger fw-bold' %> table-white ">
+                          <% if (data.status) { %>
+                          <% value='Active'; %>
+                          <% } else { %>
+                          <% value='Inactive'; %>
+                          <% } %>
+                          <%= value %>
+                      </td>
+                      <td>
+                        <% if (data.status) { %>
+                          <!-- If user is active, provide option to block -->
+                          <form action="/admin/block/<%- data._id %>" method="POST">
+                            <button type="submit" class="text-white font-size btn btn-danger px-3 py-0"
+                              onclick="return confirm('Are you sure you want to block <%=data.username%>?')">Block</button>
+                          </form>
+                          <% } else { %>
+                            <form action="/admin/unblock/<%- data._id %>" method="post">
+                              <button type="submit" class="text-white font-size btn btn-primary px-3 py-0"
+                                onclick="return confirm('Are you sure you want to un-block <%=data.username%>?')">Unblock</button>
+                            </form>
+                            <% } %>
+                      </td>
+                    </tr>
+                    <% }) %>
             </tbody>
         </table>
     </div>
 </div>
 
 <%- include('../partials/adminFooter')%>
+
+
+   
