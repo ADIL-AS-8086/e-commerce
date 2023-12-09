@@ -26,7 +26,7 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="inputEmail4" class="form-label">Category Name</label>
-                    <input class="form-control" name="name" value="<%=categoryData.categoryname %>" id="inputEmail4" required>
+                    <input class="form-control"name="name" value="<%=categoryData.categoryname %>" id="inputEmail4" pattern="[a-zA-Z]+(\s*[a-zA-Z]+)*" title="Category name must be at least 2 letters and contain only letters, with no leading or trailing spaces." required>
                 </div>
                 <div class="col-md-6">
                     <label for="productImage1" class="form-label">Image 1</label>

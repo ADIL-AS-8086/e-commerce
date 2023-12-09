@@ -3,7 +3,8 @@ const OTP = require('../model/otpSchema');
 const { sendOTP } = require("../util/otp");
 const bcrypt = require('bcrypt');
 const Category = require('../model/categorySchema');
-const Product= require('../model/prodectSchema')
+const Product = require('../model/prodectSchema');
+const User = require('../model/userSchema');
 
 
 let _email;
@@ -11,16 +12,19 @@ let _password;
 let _name;
 
 
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+
+
 
 const home = async (req, res) => {
   try {
-   
+
     const categories = await Category.find();
-    const proctData= await Product.find().limit(8);
+    const proctData = await Product.find().limit(8);
 
 
     res.render('./user/home', {
-      category: categories,proctData
+      category: categories, proctData
     });
   } catch (error) {
     console.error(error);
@@ -28,23 +32,27 @@ const home = async (req, res) => {
   }
 };
 
-const userHome=async (req,res)=>{
+
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+
+const userHome = async (req, res) => {
   try {
     const categories = await Category.find();
-    const proctData= await Product.find().limit(8);
+    const proctData = await Product.find().limit(8);
     res.render('./user/homeuser', {
-      category: categories,proctData 
+      category: categories, proctData
     });
-    
+
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 }
 
+// <<----<<<<<<<<<<<<<<<<<<<<<<<<<-----------=================->,....m,.,,----------------->>>>>>>>>>>>>>>>>>>>>>>>>>------>>
 
 const loginpage = (req, res) => {
-  res.render('./user/signin',{message:false});
+  res.render('./user/signin', { message: false });
 };
 const signuppage = (req, res) => {
   res.render('./user/signup');
@@ -54,11 +62,11 @@ const signup = async (req, res) => {
     const { name, email, password } = req.body;
     _email = email;
     _name = name,
-    _password = password;
-    const data={
-    name:req.session.body,
-    email:req.session.body,
-    password:req.session.body
+      _password = password;
+    const data = {
+      name: req.session.body,
+      email: req.session.body,
+      password: req.session.body
     }
 
     const userExist = await user.findOne({ email: email });
@@ -71,16 +79,16 @@ const signup = async (req, res) => {
     const otpInfo = await sendOTP(email);
 
     try {
-      
+
       await OTP.create({
         email: email,
         otp: otpInfo.otp,
       });
 
-      res.render('./user/otpuser', { email: email,message:false });
+      res.render('./user/otpuser', { email: email, message: false });
     } catch (error) {
       if (error.code === 11000 && error.keyValue && error.keyPattern) {
-        
+
         console.log('Duplicate key error:', error.keyValue);
 
         await OTP.updateOne(
@@ -89,9 +97,9 @@ const signup = async (req, res) => {
           { upsert: true }
         );
 
-        res.render('./user/otpuser', { email: email ,message:false});
+        res.render('./user/otpuser', { email: email, message: false });
       } else {
-   
+
         console.error('Error during OTP insertion:', error);
         res.render('./user/signup', { message: 'Error during signup' });
       }
@@ -111,39 +119,39 @@ const signup = async (req, res) => {
 
 
 
-
+// <<--------------------------------------------------------------------------------------------------------------------------->>
 
 const verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
     console.log(email, otp, '..................................................................');
 
-    
+
     const otpData = await OTP.findOne({ email: email, otp: otp, isExpired: false });
     console.log('-----------', otpData);
     if (otpData) {
-     
+
       otpData.isExpired = true;
       await otpData.save();
       console.log('otp saved.............');
 
-     
+
       try {
-        
+
         await user.create({
           username: _name,
           email: _email,
           password: _password,
-    
+
 
         });
 
-        
+
         req.session.username = _name;
         req.session.email = _email;
         req.session.userlogged = true;
 
-        res.redirect('/user/user-home'); 
+        res.redirect('/user/user-home');
       } catch (error) {
         console.error('Error during user data insertion:', error);
         return res.render('./user/otpuser', { email: _email, message: 'Error during user data insertion' });
@@ -167,28 +175,28 @@ const verifyOTP = async (req, res) => {
 
 
 
-
+// <<--------------------------------------------------------------------------------------------------------------------------->>
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log(".........", email, password);
-    
+
     const userFound = await user.findOne({ email: email });
     console.log(userFound);
 
     if (!userFound) {
-      
+
       return res.render('./user/signin', { message: 'Invalid email or password' });
     }
 
-    
+
     if (!userFound.status) {
-      
+
       return res.render('./user/signin', { message: 'Admin blocked your account' });
     }
     if (password === userFound.password) {
       console.log(userFound.email);
-     
+
       req.session.email = userFound.email;
       req.session.userlogged = true;
 
@@ -202,53 +210,244 @@ const login = async (req, res) => {
   }
 };
 
+// <<--------------------------------------------------------------------------------------------------------------------------->>
 
 const otppage = (req, res) => {
   res.render('./user/otpuser');
 };
 
+// <<--------------------------------------------------------------------------------------------------------------------------->>
 
-const shoppage =async (req, res) => {
+const shoppage = async (req, res) => {
   try {
-      const proctData =await Product.find({}).exec()
-      console.log('........................................................:', proctData);
-      res.render('./user/shop', { proctData });
+    const proctData = await Product.find({}).exec()
+    console.log('........................................................:', proctData);
+    res.render('./user/shop', { proctData });
   } catch (error) {
-      console.error('Error:', error,'..............................................');
-      res.status(500).send('Internal Server Error');
+    console.error('Error:', error, '..............................................');
+    res.status(500).send('Internal Server Error');
   }
 }
 
 
 
+// <<--------------------------------------------------------------------------------------------------------------------------->>
 
-const productdetailpage =async(req,res)=>{
+const productdetailpage = async (req, res) => {
   try {
     console.log('adilsdfghjklttttttttttttttttttttttttttttttttttttttttttttttttttt');
-    const id=req.params.id
-    const productData=await Product.findOne({_id:id})
-    console.log('mmmmmmmmmm',productData);
-    
-
-res.render('./user/productdetail',{productData})
+    const id = req.params.id
+    const productData = await Product.findOne({ _id: id })
+    console.log('mmmmmmmmmm', productData);
 
 
-    
+    res.render('./user/productdetail', { productData })
+
+
+
   } catch (error) {
     console.log(error)
-    
+
   }
 }
 
+// <<--------------------------------------------------------------------------------------------------------------------------->>
 
-const logOut=async(req,res)=>{
+const logOut = async (req, res) => {
   try {
     req.session.userlogged = false;
-    res.redirect('/user/login')
+    res.redirect('/user/signin')
   } catch (error) {
-    console.error('error while logout:',error)
+    console.error('error while logout:', error)
   }
 }
+
+
+
+
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+const profilepage = async (req, res) => {
+  try {
+    // const user = req.user;
+    const email = req.session.email;
+    const userData = await user.findOne({ email });
+    console.log(userData,'------------------------------------->');
+    res.render('./user/profile', { userData });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+
+
+
+const editUsername = async (req, res) => {
+  try {
+    const { newUserName } = req.body;
+    console.log(newUserName,'@@@');
+    const email = req.session.email; 
+    const updatedUser = await user.findOneAndUpdate({ email }, { username: newUserName }, { new: true });
+    console.log(updatedUser);
+    res.json({ success: true, updatedUser });
+  } catch (error) {
+    console.error('Error during name update:', error);
+    res.json({ success: false, error: 'Failed to update name' });
+  }
+};
+
+
+
+const profile= async(req,res)=>{
+  try {
+    const email = req.session.email;
+    const profileImage = req.file;
+
+    
+    console.log(profileImage,'ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp');
+
+    const update=await user.findOneAndUpdate({email},{$set:{profilePhoto:profileImage.filename}})
+    res.json({
+      success:true,
+    })
+  } catch (error) {
+    
+  }
+
+
+}
+
+
+
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+const adresspage = async (req, res) => {
+  try {
+    const email = req.session.email
+    const addressData = await user.findOne({ email: email }) || { address: [] };
+    res.render('./user/adressManagment', { addressData })
+
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+
+
+
+
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+
+
+
+const addadress = async (req, res) => {
+  try {
+    const email = req.session.email;
+
+    const userdata = await user.findOne({ email: email });
+
+    if (!userdata) {
+      return res.status(404).send("User not found");
+    }
+
+    const { name, address, city, state, pincode, mobile } = req.body;
+    userdata.address = userdata.address || [];
+
+    userdata.address.push({
+      name,
+      address,
+      city,
+      state,
+      pincode,
+      mobile,
+    });
+
+    await userdata.save();
+    res.redirect('/user/adress');
+
+  } catch (error) {
+    console.error("Error adding address:", error);
+
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+
+
+const editaddress = async (req, res) => {
+  try {
+    console.log("0q3498y50-8qhawbdijfbhq39pu4gtbkwAJEB");
+    const email = req.session.email;
+    const addressId = req.params.id;
+    const { name, address, city, state, mobile, pincode } = req.body;
+
+    const userData = await user.findOne({ email: email });
+    console.log(userData, 'iw34y9hbdk');
+    if (!userData) {
+      return res.status(404).send("User not found");
+    }
+
+    const existingAddress = userData.address.id(addressId);
+    console.log(existingAddress, '--------------');
+    if (!existingAddress) {
+      return res.status(404).send("Address not found");
+    }
+
+    existingAddress.name = name;
+    existingAddress.address = address;
+    existingAddress.city = city;
+    existingAddress.state = state;
+    existingAddress.mobile = mobile;
+    existingAddress.pincode = pincode;
+    console.log(existingAddress, '=========================');
+    await userData.save();
+    console.log(userData, '.............................................');
+    res.json({ success: true, message: 'edit address success' })
+  } catch (error) {
+    console.error("Error editing address:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+
+
+
+// <<----------............................................---------------============...........;/////////////.;........;;;.;.;';l'l;.l.s->>
+
+const deleteAddress = async (req, res) => {
+  try {
+    const email = req.session.email;
+    const addressId = req.params.id;
+
+    const userData = await user.findOne({ email: email });
+
+    if (!userData) {
+      return res.status(404).send("User not found");
+    }
+
+    const addressIndex = userData.address.findIndex(address => address._id == addressId);
+
+    if (addressIndex === -1) {
+      return res.status(404).send("Address not found");
+    }
+
+    userData.address.splice(addressIndex, 1);
+
+    try {
+      await userData.save();
+      res.json({ success: true, message: 'Delete address success' });
+    } catch (validationError) {
+      console.error("Validation error:", validationError);
+      res.status(422).json({ success: false, message: 'Validation error', errors: validationError.errors });
+    }
+  } catch (error) {
+    console.error("Error deleting address:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
 
 
 
@@ -263,5 +462,13 @@ module.exports = {
   shoppage,
   userHome,
   productdetailpage,
-  logOut
+  logOut,
+  profilepage,
+  adresspage,
+  addadress,
+  editaddress,
+  deleteAddress,
+  editUsername,
+profile
+
 };

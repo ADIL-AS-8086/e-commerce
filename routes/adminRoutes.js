@@ -7,17 +7,22 @@ const editmulter = require('../middleware/edilMulter');
 const productController = require('../controller/productController');
 const uploadproduct = require('../middleware/productmulter');
 
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+// <<--------------------------------------------------------------------------------------------------------------------------->>
 
 
 
 
-
-
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+// user mangement
 admin.get('/', adminController.adminpage);
 admin.get('/users', adminController.userpage);
 
 admin.post('/block/:userId',adminController.blockUser)
 admin.post('/unblock/:userId',adminController.unBlockUser)
+
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+// catogerymanagent
 
 
 admin.get('/catogeryList', catogeryController.categoryListPage);
@@ -27,9 +32,10 @@ admin.post('/toaddCatogery', upload.single('image'), catogeryController.addCateg
 admin.get('/editcategory/:id', catogeryController.editCategory);
 admin.post('/editcategory/:id', editmulter.single('image'), catogeryController.afterEditCategory);
 
-// Update the route for delete
+
 admin.post('/deleteCategory/:id', catogeryController.deleteCategory);
 
+// <<--------------------------------------------------------------------------------------------------------------------------->>
 
 
 
@@ -42,9 +48,9 @@ admin.post('/deleteCategory/:id', catogeryController.deleteCategory);
 
 
 
-
-
-// products routes
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+// products managment
 admin.get('/products', productController.productsPage);
 admin.get('/addproduct', productController.addproduct);
 
@@ -71,7 +77,8 @@ admin.post('/editproduct/:id', uploadproduct.fields([
 ]), productController.updateProduct);
 
 admin.get('/blockproduct/:id', productController.blockproducts);
-
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+// <<--------------------------------------------------------------------------------------------------------------------------->>
 
 
 module.exports = admin;
