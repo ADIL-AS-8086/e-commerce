@@ -67,14 +67,17 @@ admin.post('/addproduct', uploadproduct.fields([
 //editproduct
 admin.get('/editProduct/:id', productController.editproduct);
 
+// admin.post('/editproduct/:id', uploadproduct.fields([
+//   { name: 'productImages', maxCount: 1 },
+//   { name: 'image1', maxCount: 1 },
+//   { name: 'image2', maxCount: 1 },
+//   { name: 'image3', maxCount: 1 },
+//   { name: 'image4', maxCount: 1 },
+// ]), productController.updateProduct);
 
-admin.post('/editproduct/:id', uploadproduct.fields([
-  { name: 'productImages', maxCount: 1 },
-  { name: 'image1', maxCount: 1 },
-  { name: 'image2', maxCount: 1 },
-  { name: 'image3', maxCount: 1 },
-  { name: 'image4', maxCount: 1 },
-]), productController.updateProduct);
+admin.post('/editproduct/:id',uploadproduct.any(),productController.updateProduct)
+
+
 
 admin.get('/blockproduct/:id', productController.blockproducts);
 // <<--------------------------------------------------------------------------------------------------------------------------->>

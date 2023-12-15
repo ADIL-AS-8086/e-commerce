@@ -1,5 +1,9 @@
 const products = require('../model/prodectSchema');
 const Category = require('../model/categorySchema');
+require('dotenv').config()
+
+
+
 
 const productsPage = async (req, res) => {
   try {
@@ -121,16 +125,18 @@ const   editproduct = async (req, res) => {
 
 
 
-const  updateProduct = async (req, res) => {
+const updateProduct = async (req, res) => {
   try {
-    console.log(JSON.stringify(req.body),' Body of request_______________________________--')
+    // console.log(JSON.stringify(req.body), 'Body of request_______________________________--');
     const id = req.params.id;
     const productDetails = req.body;
-    console.log("product detailssssssssssssssssssssssssssssssssssssssssssssssssssssssssss", productDetails);
-    const files = req.files;
-    
+    // console.log("product detailssssssssssssssssssssssssssssssssssssssssssssssssssssssssss", productDetails);
+    console.log('Files:', req.files,'------------------------------------------------------->');
+// console.log('Fields:', Object.keys(req.body));
+
+
     let Obj = [];
-    console.log(req.body.variant,' Varieants _____________')
+    // console.log(req.body.variant, 'Variants _____________');
     for (let i = 0; i < req.body.variant.size.length; i++) {
       Obj.push({
         size: req.body.variant.size[i],
@@ -138,47 +144,79 @@ const  updateProduct = async (req, res) => {
       });
     }
 
-    console.log("ggggggggggggggggggggggggggggggggggggggggggggggggggggggggg",Obj)
+    // console.log("ggggggggggggggggggggggggggggggggggggggggggggggggggggggggg", Obj);
     const productData = await products.findById(id);
 
     if (!productData) {
-      console.log("Product not found");
+      // console.log("Product not found");
       return res.status(404).send("Product not found");
     }
 
     const updateData = {
       name: req.body.productname,
-      highlight1:req.body.Spec1,
-      highlight2:req.body.Spec2,
-      highlight3:req.body.Spec3,
-      highlight4:req.body.Spec4,
+      highlight1: req.body.Spec1,
+      highlight2: req.body.Spec2,
+      highlight3: req.body.Spec3,
+      highlight4: req.body.Spec4,
       price: req.body.price,
       brand: req.body.brand,
-      colour: req.body. colour,
+      colour: req.body.colour,
       category: req.body.category,
       variant: Obj,
-      images: [],
+      images: [...productData.images],
     };
 
 
-    if (files && files.productImages) {
-      updateData.images[0] = files.productImages[0].filename;
-    } else {
-      updateData.images[0] = productData.images[0];
-    }
+    // const uploadedFiles = req.files;
 
-    for (let i = 1; i <= 4; i++) {
-      const imageName = `image${i}`;
-      if (files && files[imageName]) {
-        updateData.images[i] = files[imageName][0].filename;
-      } else {
-        updateData.images[i] = productData.images[i];
+    // for (let i = 1; i <= 4; i++) {
+    //   const imageName = `image${i}`;
+    //   if (uploadedFiles && uploadedFiles[imageName]) {
+      
+    //     updateData.images[i - 1] = { filename: uploadedFiles[imageName][0].filename };
+    //   } else if (!updateData.images[i - 1]) {
+       
+    //     updateData.images[i - 1] = productData.images[i - 1] || null;
+    //   }
+    // }
+    const images = [];
+    const exisitngProduct = await products.findById(id);
+      if (exisitngProduct) {
+        images.push(...exisitngProduct.images);
       }
-    }
+      const len = exisitngProduct.images.length;
+      console.log(len);
+      for (i = 0; i < len; i++) {
+        if (req.files[i]) {
+          let temp = req.files[i]?.fieldname.split('');
+          images[temp[5]] = {filename:req.files[i]?.filename};
+        }
+      }
+      // req.body.image = images;
 
-    const uploaded = await products.updateOne({ _id: id }, { $set: updateData });
+      const productDatas = req.body;
+      
+      const uploaded = await products.updateOne(
+        { _id: id },
+        {
+           $set: updateData ,
+          images :  images,
+        }
+      );
 
-    if (uploaded) {
+      const productDataFin = await products.findById(id);
+      console.log(id,'=======id');
+      console.log(productDataFin,'productDataFin___________');
+      console.log(images,'images__________________');
+      console.log(uploaded);
+
+    
+    // console.log('Updated Images:', updateData.images);
+
+    
+    // const updatedProduct = await products.findByIdAndUpdate(id, updateData, { new: true });
+
+    if (productDataFin) {
       console.log("Product Updated");
       res.redirect('/admin/products');
     } else {
@@ -190,6 +228,10 @@ const  updateProduct = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+
+
+
 
 
 

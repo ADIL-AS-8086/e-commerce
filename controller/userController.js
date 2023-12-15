@@ -246,7 +246,7 @@ const productdetailpage = async (req, res) => {
 
 
   } catch (error) {
-    console.log(error)
+    console.log(error)  
 
   }
 }
@@ -451,6 +451,35 @@ const deleteAddress = async (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports = {
   home,
   loginpage,
@@ -469,6 +498,7 @@ module.exports = {
   editaddress,
   deleteAddress,
   editUsername,
-profile
+profile,
+
 
 };

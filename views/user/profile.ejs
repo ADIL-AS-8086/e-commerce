@@ -128,11 +128,15 @@
                                     <h6 class="mb-0">Phone</h6>
                                 </div>
                                 <div class="col-sm-9 text-secondary">
-
                                     <p>
-                                        <%=userData.address[0].mobile%>
+                                        <% if (userData.address && userData.address.length > 0 && userData.address[0].mobile) { %>
+                                            <%= userData.address[0].mobile %>
+                                        <% } else { %>
+                                            No phone number available
+                                        <% } %>
                                     </p>
                                     <hr>
+                                  
                                 </div>
                             </div>
 
@@ -240,7 +244,7 @@
 
 
 
-                <!-- // <<--------------------------------------------------------------------------------------------------------------------------->
+                <!-- // <<------------------------------------------------------------------------------------------------------------------------------>
 
 
 

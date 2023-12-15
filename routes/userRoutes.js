@@ -4,6 +4,9 @@ const userController = require('../controller/userController');
 const userAuth=require('../middleware/userAuth')
 const uploadProfile=require('../middleware/profilemulter')
 
+const cartController=require('../controller/cartcontroller')
+
+
 
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 
@@ -45,6 +48,21 @@ router.post('/user/editname', userAuth.verifyUser, userController.editUsername);
 
 
 router.post('/addprofilepic', userAuth.verifyUser,uploadProfile.single('profileImage'), userController.profile);
+
+
+
+
+// userartgetpageroute
+
+router.get('/user/user-cart',userAuth.verifyUser,cartController.cartpage)
+
+
+
+router.post('/user/add-to-cart/:id', userAuth.verifyUser, cartController.addToCart_post);
+router.patch('/user/update-cart/:id', userAuth.verifyUser, cartController.updateCartItemQuantity);
+router.delete('/user/delete-cart/:id', userAuth.verifyUser, cartController.deleteCartItem);
+
+
 
 
 module.exports = router;

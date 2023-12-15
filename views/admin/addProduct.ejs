@@ -276,9 +276,9 @@
   function removeVariant(button) {
     var variantSection = document.getElementById('variantSection');
 
-    // Ensure at least one variant is always present
+    
     if (variantSection.querySelectorAll('.variant-row').length > 1) {
-      // Remove the parent row of the clicked button
+     
       button.closest('.variant-row').remove();
     }
   }
@@ -309,34 +309,29 @@
     const form = document.querySelector('form');
 
     form.addEventListener('submit', function (event) {
-      event.preventDefault(); // Prevent form submission for now
+      event.preventDefault();
 
-      // Validate Product Name
       const productName = document.getElementById('productname').value.trim().toLowerCase();
 
-      // Check if product name contains "black" with spaces
+      
       if (productName === '' || productName.includes('black')) {
         displayValidationMessage('Please enter a valid product name.');
         return;
       }
 
-      // Validate Colour
       const colour = document.getElementById('colour').value.trim();
 
-      // Check if colour is a valid text (does not contain numbers)
       if (colour === '' || /\d/.test(colour)) {
         displayValidationMessage('Please enter a valid colour (text only, no numbers).');
         return;
       }
 
-      // Validate Price
       const price = document.getElementById('price').value.trim();
       if (price === '' || isNaN(price) || parseFloat(price) < 0) {
         displayValidationMessage('Please enter a valid price (at least 0).');
         return;
       }
 
-      // Validate Variants
       const variants = document.querySelectorAll('#variantSection .variant-row');
       if (variants.length === 0) {
         displayValidationMessage('Please add at least one variant.');
@@ -344,14 +339,14 @@
       }
 
       for (const variant of variants) {
-        // Validate Size
+    
         const size = variant.querySelector('input[name="variant[size][]"]').value.trim();
         if (size === '') {
           displayValidationMessage('Please enter a valid size for all variants.');
           return;
         }
 
-        // Validate Quantity
+        
         const quantity = variant.querySelector('input[name="variant[quantity][]"]').value.trim();
         if (quantity === '' || isNaN(quantity) || parseInt(quantity) < 0) {
           displayValidationMessage('Please enter a valid quantity for all variants (at least 0).');
@@ -360,24 +355,23 @@
       }
 
 
-      // If all validations pass, submit the form
+      
       form.submit();
     });
 
     function displayValidationMessage(message) {
-      // Remove existing alert messages
+    
       const existingAlerts = document.querySelectorAll('.alert');
       existingAlerts.forEach(alert => alert.remove());
 
-      // Create a div element for displaying the validation message
+     
       const validationMessage = document.createElement('div');
       validationMessage.classList.add('alert', 'alert-danger', 'mt-3');
       validationMessage.textContent = message;
 
-      // Append the message to the form
       form.insertBefore(validationMessage, form.firstChild);
 
-      // Remove the message after 4 seconds
+     
       setTimeout(function () {
         validationMessage.remove();
       }, 4000);

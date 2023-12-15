@@ -1,216 +1,305 @@
+  <%- include('../partials/usernav')%>
 
+  <style>
+    body {
+      background-color: #fff;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    <%- include('../partials/usernav')%>
+    .container {
+      margin: auto;
+      max-width: 1200px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px; /* Add gap between elements */
+      position: relative;
+    }
 
+    .small-images-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 300px;
+      position: sticky;
+      top: 20px;
+    }
 
+    .small-image {
+      margin: 5px 0 30px;
+      max-width: 50px;
+      width: 100%;
+      height: 50px;
+      cursor: pointer;
+    }
 
-    <style>
-        body {
-            background-color: #fff;
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    .card-container {
+      width: 100%;
+      max-width: 350px;
+      background-color: #f1f2f7;
+      position: relative;
+      overflow: hidden;
+      height: 500px;
+    }
 
-        .container {
-            margin: auto;
-            max-width: 1200px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center; 
-            gap: 20px; /* Add gap between elements */
-            position: relative;
-        }
+    .card-img-top {
+      object-fit: cover;
+      width: 100%;
+      max-height: 500px;
+      border-radius: 0;
+    }
 
-        .small-images-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center; 
-            width: 100%;
-            max-width: 300px; 
-            position: sticky;
-            top: 20px; 
-        }
+    .product-info {
+      flex: 1;
+      max-width: 400px;
+      padding: 20px;
+      text-align: center;
+      box-sizing: border-box;
+      border: 1px solid #000;
+      height: 500px;
+    }
+    .product-description{
+      font-weight: 20px;
+    }
+    .add-to-cart-btn {
+      background-color: #8bb17f;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 200px;
+      border: 1px solid #000;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-        .small-image {
-            margin: 5px 0; 
-            max-width: 50px; 
-            width: 100%;
-            height: 50px; 
-            cursor: pointer;
-        }
+    @media (max-width: 768px) {
+      .small-images-container {
+        align-items: center;
+        max-width: 100%;
+        position: relative;
+        top: 0;
+      }
 
-        .card-container {
-            width: 100%;
-            max-width: 350px; 
-            background-color: #f1f2f7;
-            position: relative;
-            overflow: hidden;
-            height: 500px; 
-        }
+      .card-container,
+      .product-info {
+        max-width: 100%;
+      }
 
-        .card-img-top {
-            object-fit: cover;
-            width: 100%;
-            max-height: 500px;
-            border-radius: 0;
-        }
+      .add-to-cart-btn {
+        max-width: 100%;
+      }
+    }
+      .btn.size-button:disabled {
+      border-color: #f1f1f1;
+      color: #d8d3d3;
+    }
+  </style>
+  </head>
 
-        .product-info {
-            flex: 1;
-            max-width: 400px; 
-            padding: 20px;
-            text-align: center;
-            box-sizing: border-box;
-            border: 1px solid #000;
-            height: 500px;
-        }
-
-        .add-to-cart-btn {
-            background-color: #8bb17f;
-            margin-top: 20px;
-            width: 100%;
-            max-width: 200px;
-            border: 1px solid #000;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        @media (max-width: 768px) {
-            .small-images-container {
-                align-items: center;
-                max-width: 100%; 
-                position: relative; 
-                top: 0;
-            }
-
-            .card-container,
-            .product-info {
-                max-width: 100%; 
-            }
-
-            .add-to-cart-btn {
-                max-width: 100%;
-            }
-        }
-    </style>
-    </head>
-
-    <body>
+  <body>
 
     <div class="container">
+      
+      <div class="small-images-container mt-5 " id="smallImagesContainer" style="margin-top: 30px;">
+          <% for (let index = 0; index < productData.images.length; index++) { %>
+            <div class="small-image ms-5 mt-3">
+              <img src="/productimages/<%= productData?.images[index]?.filename %>" class="card-img-top" alt="Image for Card <%= index + 1 %>">
+            </div>
+          <% } %> 
+        </div>
         
-        <div class="small-images-container mt-5" id="smallImagesContainer">
-            <div class="small-image ms-5">
-                <img src="/productimages/<%=productData.images[1].filename %>""
-                    class="card-img-top" alt="Image for Card 1" id="">
-            </div>
 
-            <div class="small-image mt-5 ms-5">
-                <img src="/productimages/<%=productData.images[2].filename %>""
-                    class="card-img-top" alt="Image for Card 2">
-            </div>
+      <div class="card-container mt-5">
+        <img id="mainImage" class="card-img-top" style="margin-top: 0;"
+          src="/productimages/<%= productData.images[0].filename %>" alt="Card image cap">
+      </div>
 
-            <div class="small-image mt-5 ms-5">
-                <img src="/productimages/<%=productData.images[3].filename %>""
-                    class="card-img-top" alt="Image for Card 3">
-            </div>
+      <!-- Product info container -->
+      <div class="product-info mt-5">
+        <h5 style="font-weight: bold;"><%= productData.name %></h5>
+        <p class="in-stock">In Stock</p>
+        <p style="font-weight: bolder;">Rs.<%= productData.price %> </p>
+        <p class="product-description">•<%= productData.highlight1 %></p>
+        <p class="product-description">•<%= productData.highlight2 %></p>
+        <p class="product-description">•<%= productData.highlight3 %></p>
+        <p class="product-description">•<%= productData.highlight4 %></p>
 
-            <div class="small-image mt-5 ms-5">
-                <img src="/productimages/<%=productData.images[4].filename %>"
-                    class="card-img-top" alt="Image for Card 4">
-            </div>
-        </div>
+        <p class="color-label">Colour:<%= productData.colour %> </p>
 
-
-        <div class="card-container mt-5">
-            
-            <img id="mainImage" class="card-img-top" style="margin-top: 0;"
-                src= "/productimages/<%=productData.images[0].filename %>""
-                alt="Card image cap">
-        </div>
-
-        <!-- Product info container -->
-        <div class="product-info mt-5">
-            <h5 style="font-weight: bold;"><%= productData.name %></h5>
-            <p class="in-stock">In Stock</p>
-            <p style="font-weight: bolder;">Rs.<%= productData.price %> </p>
-            <p class="product-description">•<%= productData.highlight1 %></p>
-            <p class="product-description">•<%= productData.highlight2 %></p>
-            <p class="product-description">•<%= productData.highlight3 %></p>
-            <p class="product-description">•<%= productData.highlight4 %></p>
-    
-
-     
-            <p class="color-label">Colour:<%= productData.colour %> </p>
-
-
-
-
-
-            <p class="color-label">Size:
-                <% productData.variant.forEach(variant => { %>
-                    <button type="button" 
-                            class="btn  size-button"
-                            data-size="<%= variant.size %>"
-                            style="height: 40px; width: 40px; border: 1px solid #000; margin-right: 5px; margin-left: 5px;">
-                        <%= variant.size %>
-                    </button>
-                <% }); %>
-                <button type="button" class="btn btn-light ms-5"
-                    style="height: 40px; width: 40px; border: 1px solid #000; position: relative; margin-left: 0;">
-                    <span
-                        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">
-                        <i class="fa-regular fa-heart" style="color: #000000;"></i>
-                    </span>
-                </button>
-            </p>
-
-            <button type="button" class="add-to-cart-btn mt-3"
-                style="border: 1px solid #000; background-color: 8bb17f; height: 50px; width: 100%;">
-                <span><i class="fa-solid fa-cart-plus" style="color: #000000;"></i></span> Add to Cart
+        <p class="color-label">Size:
+          <% productData.variant.forEach(variant => { %>
+            <button type="button" class="btn  size-button" data-size="<%= variant.size %>"
+              data-quantity="<%= variant.quantity %>"
+              style="height: 40px; width: 40px; border: 1px solid #000; margin-right: 5px; margin-left: 5px;"
+              <%= variant.quantity < 1 ? 'disabled' : '' %>>
+              <%= variant.size %>
             </button>
-        </div>
+          <% }); %>
+          <button type="button" class="btn btn-light ms-5"
+            style="height: 40px; width: 40px; border: 1px solid 45454545454545454545454545454545454545454545454545454545454545454545454545454545#000; position: relative; margin-left: 0;">
+            <span
+              style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">
+              <i class="fa-regular fa-heart" style="color: #000000;"></i>
+            </span>
+          </button>
+        </p>
+
+        <button type="button" class="add-to-cart-btn mt-3" id="addToCart"
+          style="border: 1px solid #000; background-color: 8bb17f; height: 50px; width: 100%;">
+          <span><i class="fa-solid fa-cart-plus" style="color: #000000;"></i></span> Add to Cart
+        </button>
+      </div>  
     </div>
 
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
-        integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz"
-        crossorigin="anonymous"></script>
+      integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz"
+      crossorigin="anonymous"></script>
 
 
-    <script>
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const smallImagesContainer = document.getElementById('smallImagesContainer');
+    const mainImage = document.getElementById('mainImage');
+    const addToCartBtn = document.getElementById('addToCart');
 
-
+    smallImagesContainer.addEventListener('click', function (event) {
+      if (event.target.classList.contains('card-img-top')) {
     
+        const clickedImageSrc = event.target.src;
+
+      
+        mainImage.src = clickedImageSrc;
+      }
+    });
+
+    const sizeButtons = document.querySelectorAll('.size-button');
+
+    sizeButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        const isButtonActive = button.classList.contains('btn-dark');
+
+      
+        sizeButtons.forEach(btn => {
+          btn.classList.remove('btn-dark');
+        });
+
+        if (!isButtonActive) {
+          button.classList.add('btn-dark');
+        }
+      });
+    });
+
+    // addToCartBtn.addEventListener('click', function () {
+    
+    //   const selectedSize = document.querySelector('.size-button.btn-dark');
+    //   if (!selectedSize) {
+        
+    //     Toastify({
+    //       text: "Please select a size before adding to the cart.",
+    //       className: "info",
+    //       position: 'center',
+    //       gravity: "top",
+    //       duration: 3000,
+    //       style: {
+    //         background: "white",
+    //         color: "#000",
+    //         marginTop: "80px",
+    //       }
+    //     }).showToast();
+
+    //     return;
+    //   }
+
+      
+
+    // });
 
 
 
-        document.addEventListener('DOMContentLoaded', function () {
+
+
+ addToCartBtn.addEventListener('click', function () {
+  // Check if at least one size button is selected
+  const selectedSize = document.querySelector('.size-button.btn-dark');
+  if (!selectedSize) {
+    // If no size is selected, show a Toastify message to the user
+    Toastify({
+      text: "Please select a size before adding to the cart.",
+      className: "info",
+      position: 'center',
+      gravity: "top",
+      duration: 3000,
+      style: {
+        background: "white",
+        color: "#000",
+        marginTop: "80px",
+      }
+    }).showToast();
+    return;
+  }
+
+  const productId = '<%= productData._id %>';
+  const size = selectedSize.getAttribute('data-size');
+
+  try {
+    fetch(`/user/add-to-cart/${productId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ size }),
+    }).then(response => {
+      if (response.ok) {
+        // If the response is OK (success), show a success message
+        showToast("Item added to the cart successfully!");
+      } else {
+        // If there's an error, show an error message
+        showToast("Error adding item to the cart. Please try again.");
+      }
+    });
+  } catch (error) {
+    console.error('Error:', error);
+  }
+});
+
+// Function to show Toastify message
+function showToast(message) {
+  Toastify({
+    text: message,
+    className: "success", // You can customize the class for styling
+    position: 'center',
+    gravity: "top",
+    duration: 3000,
+    style: {
+      background: "white",
+      color: "#000",
+      marginTop: "80px",
+    }
+  }).showToast();
+}
+
+
+      function updateSizeButtons(quantity) {
         const sizeButtons = document.querySelectorAll('.size-button');
 
         sizeButtons.forEach(button => {
-            button.addEventListener('click', function () {
-              
-                sizeButtons.forEach(btn => {
-                    btn.classList.remove('btn-dark');
-                });
-
-               
-                button.classList.add('btn-dark');
-            });
+          button.disabled = quantity === 0 || parseInt(button.getAttribute('data-quantity')) < 1;
         });
+      }
+
+
     });
-    </script>
 
+  </script>
 
-
-
-
-
-
-
+      
 
     <%- include('../partials/userlogfoter')%>
+  </body>
+
+  </html>

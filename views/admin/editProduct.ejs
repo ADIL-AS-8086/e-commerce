@@ -1,4 +1,4 @@
-<%- include('../partials/adminHeader') %>
+<%- include('../partials/adminHeader')%>
 
 
 <style>
@@ -101,13 +101,13 @@
           </div>
           <div class="col-md-6">
             <label for="productStock" class="form-label">Stock Quantity</label>
-            <input type="number" class="form-control" name="variant[quantity][]" value="<%=variant.quantity %>" placeholder="Stock" required min="1">
+            <input type="number" class="form-control" name="variant[quantity][]" value="<%=variant.quantity %>" placeholder="Stock" required min="0">
 
             <div class="variant-error-message error-message"></div>
           </div>
-          <!-- Remove Variant Icon -->
+      
           <div class="col-md-12 mt-2 d-flex justify-content-end">
-            <!-- Ensure at least one variant is always present -->
+        
             <button type="button" class="btn btn-danger" onclick="removeVariant(this)">&times;</button>
           </div>
         </div>
@@ -118,7 +118,7 @@
 
 
          
-<div class="row mt-5" style="margin-left: -10px; width: 600px; ">
+<div class="row mt-5" style="margin-left: 10px; width: 600px; ">
 
   <div class="col-md-6" style="width: 500px;">
     <div class="card bg-white">
@@ -150,15 +150,15 @@
   <a href="/admin/products" class="btn btn-secondary" style="width: 200px; margin-top: 100px;">Cancel</a>
 
 
-  <div class="col-md-6" style="margin-left: 500px; width: 600px; margin-top: -480px;">
+  <div class="col-md-6" style="margin-left: 500px; width: 400px; margin-top: -480px;">
     <div class="card bg-white">
       <div class="card-header">
         <h2>Product Images</h2>
-        <% for (let i = 0; i < productData.images.length; i++) { %>
+        <% for (let i = 0; i < 5; i++) { %>
           <div class="col-md-6">
             <label for="productImage<%= i + 1 %>" class="form-label">Image <%= i + 1 %></label>
-            <input type="file" class="form-control" name="productImages" accept="image/*" id="productImage<%= i + 1 %>" >
-  
+            <input type="file" class="form-control" name="image<%=i%>" accept="image/*" id="productImage<%= i + 1 %>">
+
             <% if (productData.images[i]) { %>
               <img src="/productimages/<%= productData.images[i].filename %>" alt="Product Image" class="preview-image" style="height: 100px; width: 100px;">
             <% } %>
@@ -170,23 +170,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        <!-- Submit Button -->
-
       </form>
 
 
@@ -194,17 +177,13 @@
       
       <script>
         document.getElementById('addVariant').addEventListener('click', function () {
-          // Clone the existing variant section and append it to the variantSection div
           var index = document.querySelectorAll('#variantSection .variant-row').length;
           var newVariantSection = document.querySelector('#variantSection .variant-row').cloneNode(true);
   
-          // Update the variant index in the new variant section
           newVariantSection.setAttribute('data-variant-index', index);
   
-          // Enable the remove button in the new variant section
           newVariantSection.querySelector('button').removeAttribute('disabled');
   
-          // Clear input values in the new variant section
           newVariantSection.querySelectorAll('input').forEach(input => {
             input.value = '';
           });
@@ -215,7 +194,6 @@
         function removeVariant(button) {
           var variantSection = document.getElementById('variantSection');
   
-          // Ensure at least one variant is always present
           if (variantSection.querySelectorAll('.variant-row').length > 1) {
             // Remove the parent row of the clicked button
             button.closest('.variant-row').remove();
@@ -265,53 +243,5 @@
      
       
    
-  
+<%- include('../partials/adminFooter')%>
 
-<%- include('../partials/adminFooter') %>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<
-
-
-
-
-
-
-
-
-<!-- 
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-<!-- 
- -->
