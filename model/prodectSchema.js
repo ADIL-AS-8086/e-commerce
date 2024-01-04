@@ -23,6 +23,12 @@ const ProductsSchema = new Schema({
 
     }
   }],
+    offer: {
+    discountPercentage: { type: Number, min: 0, max: 100, default: 0 },
+    startDate: { type: Date },
+    endDate: { type: Date },
+    additionalDetails: { type: String },
+  },
   timeStamp: { type: Date },
   images: { type: Array },
   colour: { type: String },

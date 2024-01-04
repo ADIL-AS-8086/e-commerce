@@ -1,5 +1,11 @@
   <%- include('../partials/usernav')%>
 
+
+  <link rel="stylesheet" href="/style/card.css">
+  <link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
+
   <style>
     body {
       background-color: #fff;
@@ -96,6 +102,22 @@
       border-color: #f1f1f1;
       color: #d8d3d3;
     }
+    .zoomContainer {
+       overflow: hidden;
+       position: relative;
+       width: 500px;
+   }
+
+   .zoomLens {
+       border: 2px solid #fffdfd;
+       cursor: crosshair;
+   }
+
+   .zoomWindow {
+       background: #fff;
+       border: 2px solid #aaa;
+       box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+   }
   </style>
   </head>
 
@@ -119,27 +141,26 @@
 
       <!-- Product info container -->
       <div class="product-info mt-5">
-        <h5 style="font-weight: bold;"><%= productData.name %></h5>
-        <p class="in-stock">In Stock</p>
+        <h5 style="font-weight: bold;"><%= productData.name%></h5>
         <p style="font-weight: bolder;">Rs.<%= productData.price %> </p>
         <p class="product-description">•<%= productData.highlight1 %></p>
         <p class="product-description">•<%= productData.highlight2 %></p>
         <p class="product-description">•<%= productData.highlight3 %></p>
         <p class="product-description">•<%= productData.highlight4 %></p>
 
-        <p class="color-label">Colour:<%= productData.colour %> </p>
+        <p class="color-label" style="font-weight: bold;">Colour:<%= productData.colour %> </p>
 
         <p class="color-label">Size:
           <% productData.variant.forEach(variant => { %>
-            <button type="button" class="btn  size-button" data-size="<%= variant.size %>"
-              data-quantity="<%= variant.quantity %>"
+            <button type="button" class="btn  size-button" data-size="<%= variant.size%>"
+              data-quantity="<%= variant.quantity %>" data-id="<%=variant._id %>"
               style="height: 40px; width: 40px; border: 1px solid #000; margin-right: 5px; margin-left: 5px;"
               <%= variant.quantity < 1 ? 'disabled' : '' %>>
               <%= variant.size %>
             </button>
           <% }); %>
           <button type="button" class="btn btn-light ms-5"
-            style="height: 40px; width: 40px; border: 1px solid 45454545454545454545454545454545454545454545454545454545454545454545454545454545#000; position: relative; margin-left: 0;">
+            style="height: 40px; width: 40px; border: 1px solid #000; position: relative; margin-left: 0;">
             <span
               style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">
               <i class="fa-regular fa-heart" style="color: #000000;"></i>
@@ -153,6 +174,31 @@
         </button>
       </div>  
     </div>
+<hr style="margin-top: 70px;">
+
+
+    <h5 style="margin-top: 50px; margin-left: 50px; font-weight: bold;">Related Products</h5>
+<div class="row">
+  <% relatedProducts.forEach(relatedProduct => { %>
+    <div class="col-md-3">
+      <div class="custom-card-container ms-5 mt-5">
+        <a href="#" class="custom-icon-heart"><i class="fa-regular fa-heart"></i></a>
+        <a href="#" class="custom-icon-cart"><i class="fas fa-cart-plus"></i></a>
+        <a href="/user/product-view/<%= relatedProduct._id %>">
+          <img class="card-img-top" src="/productimages/<%= relatedProduct.images[0].filename %>"
+            alt="Card image cap">
+        </a>
+      </div>
+      <div class="custom-additional-info ms-5">
+        <p><%= relatedProduct.name %></p>
+        <p class="custom-p" style="margin-left: 40px; font-weight: bolder;">₹ <%= relatedProduct.price %></p>
+      </div>
+    </div>
+  <% }); %>
+</div>
+
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
       integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz"
@@ -161,6 +207,33 @@
 
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
+  <script>
+ 
+    $(document).ready(function () {
+      $(".small-images-container .small-image").click(function () {
+        var newImageSrc = $(this).find("img").attr("src");
+        $("#mainImage").attr("src", newImageSrc);
+        initializeImageZoom();
+      });
+
+      initializeImageZoom();
+
+      function initializeImageZoom() {
+        $('#mainImage').elevateZoom({
+          zoomType: "inner",
+          cursor: "crosshair",
+          responsive: true,
+          borderSize: 0,
+          easing: true,
+          gallery: 'multi-item-example',
+          galleryActiveClass: 'active',
+          lensBorderSize: 1,
+          lensShape: 'round',
+          containLensZoom: true
+        });
+      }
+    })
+ </script>
   <script>
   document.addEventListener('DOMContentLoaded', function () {
     const smallImagesContainer = document.getElementById('smallImagesContainer');
@@ -174,51 +247,35 @@
 
       
         mainImage.src = clickedImageSrc;
+        
       }
     });
 
     const sizeButtons = document.querySelectorAll('.size-button');
 
-    sizeButtons.forEach(button => {
-      button.addEventListener('click', function () {
-        const isButtonActive = button.classList.contains('btn-dark');
+sizeButtons.forEach(button => {
+  const quantity = parseInt(button.getAttribute('data-quantity'));
 
-      
-        sizeButtons.forEach(btn => {
-          btn.classList.remove('btn-dark');
-        });
+  new bootstrap.Tooltip(button, {
+    placement: 'top',
+    title: quantity < 10 ? `Hurry! Only ${quantity} ${quantity === 1 ? 'item' : 'items'} left.` : '',
+  
+  });
 
-        if (!isButtonActive) {
-          button.classList.add('btn-dark');
-        }
-      });
+  button.addEventListener('click', function () {
+    const isButtonActive = button.classList.contains('btn-dark');
+
+    sizeButtons.forEach(btn => {
+      btn.classList.remove('btn-dark');
     });
 
-    // addToCartBtn.addEventListener('click', function () {
-    
-    //   const selectedSize = document.querySelector('.size-button.btn-dark');
-    //   if (!selectedSize) {
-        
-    //     Toastify({
-    //       text: "Please select a size before adding to the cart.",
-    //       className: "info",
-    //       position: 'center',
-    //       gravity: "top",
-    //       duration: 3000,
-    //       style: {
-    //         background: "white",
-    //         color: "#000",
-    //         marginTop: "80px",
-    //       }
-    //     }).showToast();
+    if (!isButtonActive) {
+      button.classList.add('btn-dark');
+    }
+  });
+});
 
-    //     return;
-    //   }
-
-      
-
-    // });
-
+ 
 
 
 
@@ -245,23 +302,27 @@
 
   const productId = '<%= productData._id %>';
   const size = selectedSize.getAttribute('data-size');
-
+  const sizeId =selectedSize.getAttribute('data-id')
   try {
     fetch(`/user/add-to-cart/${productId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ size }),
+      body: JSON.stringify({ size,sizeId }),
     }).then(response => {
       if (response.ok) {
-        // If the response is OK (success), show a success message
         showToast("Item added to the cart successfully!");
       } else {
-        // If there's an error, show an error message
-        showToast("Error adding item to the cart. Please try again.");
+        return response.json();
+      }
+    })
+    .then(data => {
+      if (data && data.error) {
+        showToast(data.error);
       }
     });
+  
   } catch (error) {
     console.error('Error:', error);
   }
@@ -271,7 +332,7 @@
 function showToast(message) {
   Toastify({
     text: message,
-    className: "success", // You can customize the class for styling
+    className: "success", 
     position: 'center',
     gravity: "top",
     duration: 3000,
@@ -296,6 +357,10 @@ function showToast(message) {
     });
 
   </script>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.6.4.slim.min.js" integrity="sha384-GLhlTQ8iK1iKFY9PCJFbb6AyOBHjC1M1TwLd5ULC4NlGAYOqDGlC1qzKw5c8Tda" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-rZo+Jb46p9z7fjzDO9shCjbQz1TNPnNfmGc5b3PP9UmphRRV5ujlwg6jqSMsWK3D" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js" integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous"></script>
 
       
 

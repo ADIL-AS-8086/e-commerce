@@ -47,9 +47,9 @@ const cartpage = async (req, res) => {
 const addToCart_post = async (req, res) => {
     try {
         const productId = req.params.id;
-        const { size } = req.body;
+        const { size,sizeId } = req.body;
         const email = req.session.email;
-
+        console.log(size,'----?-??_??_____',sizeId);
         const userData = await User.findOne({ email });
 
         if (!userData) {
@@ -67,14 +67,25 @@ const addToCart_post = async (req, res) => {
         const existingItem = userCart.cartItems.find(item => {
             return item.products.equals(new mongoose.Types.ObjectId(productId)) && item.size === size;
         });
+       
 
         if (existingItem) {
+            const product = await products.findById(productId);
+            
+            if (product) {
+                const variant = product.variant.find(v => v.size === size);
+                if (variant && existingItem.quantity + 1 > variant.quantity) {
+                    return res.status(400).json({ error: 'Not enough stock available for the selected size.' });
+                }
+            }
+
             existingItem.quantity += 1;
         } else {
             userCart.cartItems.push({
                 products: new mongoose.Types.ObjectId(productId),
                 quantity: 1,
                 size: size,
+            
             });
         }
 
@@ -94,10 +105,9 @@ const addToCart_post = async (req, res) => {
 const updateCartItemQuantity=async(req,res)=>{
    console.log('@@@@@@@@@@');
     try {
-console.log("222222111111111111111111111111111");
+console.log("2222221111111111");
         const  itemId= req.params.id;
         const { quantity } = req.body;
-
         const userCart=await Cart.findOneAndUpdate(
             {'cartItems._id':itemId},
             {$set:{'cartItems.$.quantity':quantity}},
@@ -144,7 +154,27 @@ const deleteCartItem = async (req, res) => {
     }
 };
 
+const checkQuantity=async(req,res)=>{
+    try {
+        const { ProId, quantity,size } = req.params;
+        console.log(ProId);
+        console.log(quantity);
 
+        const product = await products.findById(ProId);
+
+        const variant = product.variant.find((v) => v.size === size);
+
+    if (variant && variant.quantity >= quantity) {
+      res.status(200).json({ message: 'Quantity available.' });
+      console.log("@@@@@@@@@@");
+    } else {
+      res.status(400).json({ error: 'Not enough stock available for the selected quantity.' });
+    }
+    } catch (error) {
+        console.error("error while quantity checking:",error)
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
 
 
 
@@ -155,7 +185,8 @@ module.exports = {
     addToCart_post,
     cartpage,
     updateCartItemQuantity,
-    deleteCartItem
+    deleteCartItem,
+    checkQuantity
 };
 
 

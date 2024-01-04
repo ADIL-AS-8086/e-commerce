@@ -19,8 +19,8 @@ let _name;
 const home = async (req, res) => {
   try {
 
-    const categories = await Category.find();
-    const proctData = await Product.find().limit(8);
+    const categories = await Category.find({ isDeleted: false });
+    const proctData = await Product.find({ isDeleted: false,Status: true  }).limit(8);
 
 
     res.render('./user/home', {
@@ -37,8 +37,8 @@ const home = async (req, res) => {
 
 const userHome = async (req, res) => {
   try {
-    const categories = await Category.find();
-    const proctData = await Product.find().limit(8);
+    const categories = await Category.find({ isDeleted: false ,Status: true });
+    const proctData = await Product.find({ isDeleted: false ,Status: true }).limit(8);
     res.render('./user/homeuser', {
       category: categories, proctData
     });
@@ -220,7 +220,7 @@ const otppage = (req, res) => {
 
 const shoppage = async (req, res) => {
   try {
-    const proctData = await Product.find({}).exec()
+    const proctData = await Product.find({ isDeleted: false ,Status: true }).exec()
     console.log('........................................................:', proctData);
     res.render('./user/shop', { proctData });
   } catch (error) {
@@ -231,17 +231,34 @@ const shoppage = async (req, res) => {
 
 
 
+
+
+
+
+
+
+
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 
 const productdetailpage = async (req, res) => {
   try {
     console.log('adilsdfghjklttttttttttttttttttttttttttttttttttttttttttttttttttt');
     const id = req.params.id
-    const productData = await Product.findOne({ _id: id })
-    console.log('mmmmmmmmmm', productData);
+    const productData = await Product.findOne({ _id: id }).populate('categoryId')
+    const relatedProducts = await Product.find({
+      brand: productData.brand,
+       isDeleted: false, 
+       Status: true ,
+       categoryId: productData.categoryId,
+      _id: { $ne: id }, 
+    }).limit(4);
+    // console.log('mmmmmmmmmm', productData);
+console.log(relatedProducts,'+++++++++++++++++++++++++++++++++');
+
+    res.render('./user/productdetail', { productData,relatedProducts })
 
 
-    res.render('./user/productdetail', { productData })
+
 
 
 
@@ -318,6 +335,77 @@ const profile= async(req,res)=>{
 }
 
 
+
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+
+const toforget = async(req,res)=>{
+  try {
+    res.render('./user/forget-pass')
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const forgotpassword = async (req, res) => {
+  console.log('????????????????????????????????????????????????????????????????????????????????????????????');
+  try {
+    const { email } = req.body;
+    console.log(req.body, email, 'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm');
+
+    const userExist = await user.findOne({ email: email });
+
+    if (!userExist) {
+      return res.render('./user/forget-pass', { message: 'Email not found' });
+    }
+
+    const otpInfo = await sendOTP(email);
+
+    try {
+      await OTP.updateOne({
+        email: email,
+        otp: otpInfo.otp,
+      });
+    } catch (error) {
+      console.error('Error during OTP insertion:', error);
+      return res.render('./user/forgotpassword', { message: 'Error during OTP generation' });
+    }
+
+    res.render('./user/forgetPassOTP', { message: 'OTP sent successfully', email: email });
+  } catch (error) {
+    console.error('Error during forgot password:', error);
+
+    res.status(500).render('./user/forgotpassword', { errorMessage: 'Internal Server Error' });
+  }
+};
+
+
+const forgetPassOtpVerification=async(req,res)=>{
+  try {
+    const { email, otp } = req.body;
+    console.log(email, otp, '..................................................................');
+
+
+    const otpData = await OTP.findOne({ email: email, otp: otp, isExpired: false });
+    console.log('-----------', otpData);
+    if (otpData) {
+
+      otpData.isExpired = true;
+      await otpData.save();
+      console.log('otp saved.............');
+
+      req.session.email = email;
+      req.session.userlogged = true;
+
+      res.redirect('/user/user-home');
+
+    } else {
+      return res.render('./user/forgetPassOTP', { email: _email, message: 'Invalid OTP' });
+    }
+  } catch (error) {
+    console.error('Error during OTP verification:', error);
+    return res.render('./user/forgetPassOTP', { email: _email, message: 'Error during OTP verification' });
+  }
+}
 
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 const adresspage = async (req, res) => {
@@ -499,6 +587,8 @@ module.exports = {
   deleteAddress,
   editUsername,
 profile,
-
+forgotpassword,
+toforget,
+forgetPassOtpVerification
 
 };

@@ -98,6 +98,30 @@
               </div>
             </div>
 
+
+            <!-- <div class="row mt-5">
+              <div class="col-md-6">
+                <div class="card bg-white">
+                  <div class="card-header">
+                    <h2>Product Offer</h2>
+                    <div class="col-md-12">
+                      <label for="discountPercentage" class="form-label">Discount Percentage</label>
+                      <input type="number" class="form-control" name="discountPercentage" id="discountPercentage" min="0" max="100">
+                    </div>
+                    <div class="col-md-12">
+                      <label for="startDate" class="form-label">Start Date</label>
+                      <input type="date" class="form-control" name="startDate" id="startDate">
+                    </div>
+                    <div class="col-md-12">
+                      <label for="endDate" class="form-label">End Date</label>
+                      <input type="date" class="form-control" name="endDate" id="endDate">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+
+
             <!-- Image Upload Section -->
             <div class="row mt-5">
               <!-- Card for Highlights -->
@@ -260,14 +284,11 @@
   });
 
   document.getElementById('addVariant').addEventListener('click', function () {
-    // Clone the existing variant section and append it to the variantSection div
     var index = document.querySelectorAll('#variantSection .variant-row').length;
     var newVariantSection = document.querySelector('#variantSection .variant-row').cloneNode(true);
 
-    // Update the variant index in the new variant section
     newVariantSection.setAttribute('data-variant-index', index);
 
-    // Enable the remove button in the new variant section
     newVariantSection.querySelector('button').removeAttribute('disabled');
 
     document.getElementById('variantSection').appendChild(newVariantSection);
@@ -302,81 +323,69 @@
 
 
 
-
-  
-  
-  document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('form');
 
     form.addEventListener('submit', function (event) {
-      event.preventDefault();
+        event.preventDefault();
 
-      const productName = document.getElementById('productname').value.trim().toLowerCase();
-
-      
-      if (productName === '' || productName.includes('black')) {
-        displayValidationMessage('Please enter a valid product name.');
-        return;
-      }
-
-      const colour = document.getElementById('colour').value.trim();
-
-      if (colour === '' || /\d/.test(colour)) {
-        displayValidationMessage('Please enter a valid colour (text only, no numbers).');
-        return;
-      }
-
-      const price = document.getElementById('price').value.trim();
-      if (price === '' || isNaN(price) || parseFloat(price) < 0) {
-        displayValidationMessage('Please enter a valid price (at least 0).');
-        return;
-      }
-
-      const variants = document.querySelectorAll('#variantSection .variant-row');
-      if (variants.length === 0) {
-        displayValidationMessage('Please add at least one variant.');
-        return;
-      }
-
-      for (const variant of variants) {
-    
-        const size = variant.querySelector('input[name="variant[size][]"]').value.trim();
-        if (size === '') {
-          displayValidationMessage('Please enter a valid size for all variants.');
-          return;
+        const productName = document.getElementById('productname').value.trim().toLowerCase();
+        if (productName === '' || productName.includes('black')) {
+            displayValidationMessage('Please enter a valid product name.');
+            return;
         }
 
-        
-        const quantity = variant.querySelector('input[name="variant[quantity][]"]').value.trim();
-        if (quantity === '' || isNaN(quantity) || parseInt(quantity) < 0) {
-          displayValidationMessage('Please enter a valid quantity for all variants (at least 0).');
-          return;
+        const colour = document.getElementById('colour').value.trim();
+        if (colour === '' || /\d/.test(colour)) {
+            displayValidationMessage('Please enter a valid colour (text only, no numbers).');
+            return;
         }
-      }
 
+        const price = document.getElementById('price').value.trim();
+        if (price === '' || isNaN(price) || parseFloat(price) < 0) {
+            displayValidationMessage('Please enter a valid price (at least 0).');
+            return;
+        }
 
-      
-      form.submit();
+        const variants = document.querySelectorAll('#variantSection .variant-row');
+        if (variants.length === 0) {
+            displayValidationMessage('Please add at least one variant.');
+            return;
+        }
+
+        for (const variant of variants) {
+            const size = variant.querySelector('input[name="variant[size][]"]').value.trim();
+            if (size === '') {
+                displayValidationMessage('Please enter a valid size for all variants.');
+                return;
+            }
+
+            const quantity = variant.querySelector('input[name="variant[quantity][]"]').value.trim();
+            if (quantity === '' || isNaN(quantity) || parseInt(quantity) < 0) {
+                displayValidationMessage('Please enter a valid quantity for all variants (at least 0).');
+                return;
+            }
+        }
+
+        form.submit();
     });
 
     function displayValidationMessage(message) {
-    
-      const existingAlerts = document.querySelectorAll('.alert');
-      existingAlerts.forEach(alert => alert.remove());
+        const existingAlerts = document.querySelectorAll('.alert');
+        existingAlerts.forEach(alert => alert.remove());
 
-     
-      const validationMessage = document.createElement('div');
-      validationMessage.classList.add('alert', 'alert-danger', 'mt-3');
-      validationMessage.textContent = message;
+        const validationMessage = document.createElement('div');
+        validationMessage.classList.add('alert', 'alert-danger', 'mt-3');
+        validationMessage.textContent = message;
 
-      form.insertBefore(validationMessage, form.firstChild);
+   
+        form.appendChild(validationMessage);
 
-     
-      setTimeout(function () {
-        validationMessage.remove();
-      }, 4000);
+        setTimeout(function () {
+            validationMessage.remove();
+        }, 4000);
     }
-  });
+});
 
 
 </script>

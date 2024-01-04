@@ -11,6 +11,7 @@ const cartSchema = new mongoose.Schema({
         }
     ],
     TotalAmount: { type: Number  },
+    
 })
 
 const cart = mongoose.model('cart', cartSchema)

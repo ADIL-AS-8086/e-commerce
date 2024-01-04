@@ -74,6 +74,9 @@
                         <th scope="col">Image</th>
                         <th scope="col">Edit</th>
                         <th scope="col">Archive</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -81,7 +84,8 @@
                     <tr>
                         <td><%=++i %></td>
                         <td><%=data.categoryname %></td>
-                        <td><%=data.date %></td>
+                        <td><%= data.date.toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) %></td>
+
                         <td class="img-column"><img src="/uploadedImages/<%=data.image %>" alt="Image 1"></td>
                         <td>
                             <a href="/admin/editCategory/<%= data._id %>">
@@ -99,6 +103,20 @@
                                 </button>
                             </form>
                         </td>
+                        <td class="<%= data.Status ? 'active-status' : 'blocked-status' %>" style="font-weight: bold;">
+                            <%= data.Status ? 'Active' : 'Blocked' %>
+                        </td>
+                        <td>
+                            <% if (data.Status) { %>
+                                <button type="button" class="btn btn-secondary" onclick="blockCategory('<%= data._id %>')">
+                                    <i class="fas fa-ban" style="color: white;"></i> Block
+                                </button>
+                            <% } else { %>
+                                <button type="button" class="btn btn-success" onclick="blockCategory('<%= data._id %>')">
+                                    <i class="fas fa-unlock" style="color: white;"></i> Unblock
+                                </button>
+                            <% } %>
+                        </td>
                     </tr>
                     <% }) %>
                 </tbody>
@@ -106,23 +124,74 @@
         </div>
     </div>
 
-    <!-- SweetAlert integration script -->
-    <script>
-        function deleteCategory(categoryId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'your category will be delted,no option to retrive',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.forms['deleteCategoryForm_' + categoryId].submit();
-                }
-            });
-        }
-    </script>
+<script>
+    function deleteCategory(categoryId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Your category will be deleted, and there is no option to retrieve it.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.forms['deleteCategoryForm_' + categoryId].submit();
+            }
+        });
+    }
+
+    function blockCategory(categoryId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Your category will be blocked',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, block it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/admin/blockCategory/${categoryId}`, {
+                    method: 'POST',
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        throw new Error('Failed to block category');
+                    }
+                }).catch(error => {
+                    console.error(error);
+                });
+            }
+        });
+    }
+
+    function unblockCategory(categoryId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Your category will be unblocked',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, unblock it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/admin/unblockCategory/${categoryId}`, {
+                    method: 'POST',
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        throw new Error('Failed to unblock category');
+                    }
+                }).catch(error => {
+                    console.error(error);
+                });
+            }
+        });
+    }
+</script>
 
 <%- include('../partials/adminFooter')%>

@@ -9,7 +9,7 @@ const supportedFormats = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 
 
 const categoryListPage = async (req, res) => {
     var i = 0
-    const categoryData = await category.find()
+    const categoryData = await category.find({ isDeleted: false })
     res.render("./admin/CategoryList", { categoryData, i })
 }
 
@@ -91,8 +91,10 @@ const afterEditCategory = async (req, res) => {
 
       
         const existingCategory = await category.findOne({
+            isDeleted: false ,
             categoryname: { $regex: new RegExp('^' + name + '$', 'i') },
-            _id: { $ne: id }
+            _id: { $ne: id },
+            
         });
 
         if (existingCategory) {
@@ -132,16 +134,13 @@ const afterEditCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
     try {
         const id = req.params.id;
-
-  
         
-        const deletedCategory = await category.findByIdAndDelete(id);
+        const updatedCategory = await category.findByIdAndUpdate(id, { isDeleted: true });
 
-        if (!deletedCategory) {
+        if (!updatedCategory) {
             return res.status(404).send('Category not found');
         }
 
-       
         res.redirect('/admin/catogeryList');
     } catch (err) {
         console.error(err);
@@ -150,13 +149,40 @@ const deleteCategory = async (req, res) => {
 };
 
 
+const blockcatogery = async (req, res) => {
+    try {
+        
+      console.log('--------------------------');
+      const id = req.params.id;
+      console.log(',,,,,,,,,,,',id);
+      const categoryData=await category.findById(id)
+      console.log(categoryData);
+      const newStatus = !categoryData.Status;
+      await category.updateOne(
+          { _id: id },
+          { $set: { Status: newStatus } }
+      );
+      console.log('............................................',newStatus);
+  
+      res.redirect('/admin/catogeryList');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    }
+  };
+  
+
+
+
 module.exports = {
     addCategorypage,
     addCategory ,
     categoryListPage ,
     editCategory,
     afterEditCategory,
-    deleteCategory
+    deleteCategory,
+    blockcatogery
+
      
     // editCategorypage
 }

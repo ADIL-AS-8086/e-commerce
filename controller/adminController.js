@@ -2,16 +2,53 @@
 const User=require('../model/userSchema')
 
 
-// adminController.js
+const credentail={
+    email:"admin@gmail.com",
+    password:"123456789"
+}
+
 const adminpage = (req, res) => {
     res.render('./admin/adminHome');
 };
 
+const login= (req,res) =>{
+res.render('./admin/adminLogin')
+}
+
+const loginPost=(req,res)=>{
+    try {
+        const{email,pass}=req.body
+        console.log(email,pass,'.....................................');
+        if(credentail.email==email && credentail.password==pass){
+            req.session.adminlogged=true
+            res.render('./admin/adminHome');
+        }else{
+            res.render('./admin/adminLogin',{error:'password or email wrong'})
+        }
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 
 const userpage = async (req, res) => {
-    var i = 0;
-    const userData = await User.find().sort({ username: 1, email: 1, status: 1 });
-    res.render('./admin/users', { userData, i });
+    try {
+        const userData = await User.find().sort({ username: 1, email: 1, status: 1 });
+        const totalUsersCount = userData.length;
+        const activeUsersCount = userData.filter(user => user.status).length;
+        const blockedUsersCount = totalUsersCount - activeUsersCount;
+
+        res.render('./admin/users', {
+            userData,
+            totalUsersCount,
+            activeUsersCount,
+            blockedUsersCount
+        });
+    } catch (error) {
+        console.error('Error while fetching user data:', error);
+
+        res.status(500).send('Internal Server Error');
+    }
 };
 
 
@@ -53,7 +90,9 @@ module.exports = {
     adminpage,
     userpage,
     blockUser,
-    unBlockUser
+    unBlockUser,
+    login,
+    loginPost
     // productsPage,
    // Add the new method
 

@@ -8,6 +8,9 @@ const cartController=require('../controller/cartcontroller')
 
 
 
+const orderController=require('../controller/ordercontroller')
+
+
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 
 
@@ -17,8 +20,12 @@ router.get('/user/signup',userAuth.userExist,userController.signuppage);
 router.post('/user/usersignup',userAuth.userExist,userController.signup);
 router.post('/user/login',userAuth.userExist,userController.login);
 router.get('/user/otpuser',userAuth.userExist,userController.otppage);
+router.post('/user/for-got-pass-word',userAuth.userExist,userController.forgotpassword)
+router.post('/user/verifyPasswordOtp',userAuth.userExist,userController.forgetPassOtpVerification)
+router.get('/user/forgetPass',userAuth.userExist,userController.toforget)
 
-// Add this route for OTP verification
+
+
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 router.post('/user/verifyotp',userAuth.userExist,userController.verifyOTP);
 
@@ -61,6 +68,27 @@ router.get('/user/user-cart',userAuth.verifyUser,cartController.cartpage)
 router.post('/user/add-to-cart/:id', userAuth.verifyUser, cartController.addToCart_post);
 router.patch('/user/update-cart/:id', userAuth.verifyUser, cartController.updateCartItemQuantity);
 router.delete('/user/delete-cart/:id', userAuth.verifyUser, cartController.deleteCartItem);
+router.get('/user/check-quantity/:ProId/:size/:quantity', userAuth.verifyUser, cartController.checkQuantity);
+
+
+
+// usercheckout
+
+
+
+router.get('/user/check-out', userAuth.verifyUser,orderController.checkoutpage)
+
+
+
+router.post('/user/placeOrder',userAuth.verifyUser,orderController.orderSuccess)
+router.get('/user/ordersuccess',userAuth.verifyUser,orderController.successOrder)
+router.get('/user/order-history', userAuth.verifyUser, orderController.orderHistory);
+router.patch('/user/cancel-order/:orderId', userAuth.verifyUser,orderController.Cancelorderstatus);
+
+
+
+
+
 
 
 

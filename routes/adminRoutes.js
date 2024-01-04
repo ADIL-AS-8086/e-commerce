@@ -6,7 +6,8 @@ const upload = require('../middleware/multer');
 const editmulter = require('../middleware/edilMulter');
 const productController = require('../controller/productController');
 const uploadproduct = require('../middleware/productmulter');
-
+const orderController=require('../controller/ordercontroller')
+const adminAuth=require('../middleware/adminAuth')
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 
@@ -15,25 +16,33 @@ const uploadproduct = require('../middleware/productmulter');
 
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 // user mangement
-admin.get('/', adminController.adminpage);
-admin.get('/users', adminController.userpage);
 
-admin.post('/block/:userId',adminController.blockUser)
-admin.post('/unblock/:userId',adminController.unBlockUser)
+admin.get('/', adminAuth.adminExist,adminController.login);
+admin.get('/users',adminAuth.verifyAdmin,adminController.userpage);
+admin.post('/adminLogin',adminAuth.adminExist,adminController.loginPost)
+
+
+
+admin.post('/block/:userId',adminAuth.verifyAdmin,adminController.blockUser)
+admin.post('/unblock/:userId',adminAuth.verifyAdmin,adminController.unBlockUser)
 
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 // catogerymanagent
 
 
-admin.get('/catogeryList', catogeryController.categoryListPage);
-admin.get('/addCategory', catogeryController.addCategorypage);
-admin.post('/toaddCatogery', upload.single('image'), catogeryController.addCategory);
+admin.get('/catogeryList',adminAuth.verifyAdmin, catogeryController.categoryListPage);
+admin.get('/addCategory',adminAuth.verifyAdmin, catogeryController.addCategorypage);
+admin.post('/toaddCatogery',upload.single('image'), catogeryController.addCategory);
 
-admin.get('/editcategory/:id', catogeryController.editCategory);
+admin.get('/editcategory/:id',adminAuth.verifyAdmin, catogeryController.editCategory);
 admin.post('/editcategory/:id', editmulter.single('image'), catogeryController.afterEditCategory);
 
+admin.post('/blockCategory/:id', adminAuth.verifyAdmin, catogeryController.blockcatogery);
 
-admin.post('/deleteCategory/:id', catogeryController.deleteCategory);
+
+
+
+admin.post('/deleteCategory/:id',adminAuth.verifyAdmin, catogeryController.deleteCategory);
 
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 
@@ -80,8 +89,21 @@ admin.post('/editproduct/:id',uploadproduct.any(),productController.updateProduc
 
 
 admin.get('/blockproduct/:id', productController.blockproducts);
-// <<--------------------------------------------------------------------------------------------------------------------------->>
+
+admin.post('/delete-product/:id', productController.softDeleteProduct);
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 
 
-module.exports = admin;
+admin.get('/offer-list',productController.offerpage)
+admin.post('/add-offer/:id', productController.addoffer);
+// <<--------------------------------------------------------------------------------------------------------------------------->>
+
+
+// orderadmin
+
+admin.get('/order-list', orderController.OrderList);
+
+admin.post('/updateOrderStatus',orderController.updateOrderStatus);
+
+
+module.exports = admin

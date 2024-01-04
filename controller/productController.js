@@ -8,7 +8,7 @@ require('dotenv').config()
 const productsPage = async (req, res) => {
   try {
     
-    const productData = await products.find().populate('categoryId');;
+    const productData = await products.find({ isDeleted: false }).populate('categoryId');;
 
         
     res.render('./admin/products', { productData ,errorMessage:null});
@@ -22,7 +22,7 @@ const addproduct = async (req, res) => {
   try {
     
     
-    const categories = await Category.find();
+    const categories = await Category.find({ isDeleted: false });
 
     
     res.render('./admin/addproduct', { categories , errorMessage:null});
@@ -42,9 +42,10 @@ const toaddProduct = async (req, res) => {
 
   
    const existingProduct = await products.findOne({
+     isDeleted: false ,
      name: { $regex: new RegExp('^' + productNameLower + '$', 'i') },
    });
-      const categories = await Category.find();
+      const categories = await Category.find({ isDeleted: false });
 
    if (existingProduct) {
     
@@ -115,7 +116,7 @@ const   editproduct = async (req, res) => {
   const id = req.params.id
   const productData = await products.findOne({ _id: id })
   const variant = productData.variant
-  const categories = await Category.find()
+  const categories = await Category.find({ isDeleted: false })
 
 
   const selectedCategory = await Category.findById(productData.categoryId);
@@ -258,9 +259,103 @@ const blockproducts = async (req, res) => {
 
 
 
+const checkStock = async (req, res) => {
+  try {
+      const productsToCheck = JSON.parse(req.body.products);
+
+      for (const productInfo of productsToCheck) {
+          const product = await Product.findById(productInfo.productId);
+          
+          if (!product) {
+              return res.json({ success: false, error: "Product not found." });
+          }
+
+          const variant = product.variant.find(v => v.size === productInfo.size);
+
+          if (!variant) {
+              return res.json({ success: false, error: "Variant not found for the product." });
+          }
+
+          if (variant.quantity < productInfo.quantity) {
+              return res.json({ success: false, error: `Not enough stock available for product ${product.name}` });
+          }
+      }
+
+      res.json({ success: true });
+  } catch (error) {
+      console.error('Error while checking stock:', error);
+      res.json({ success: false, error: 'Internal server error' });
+  }
+};
 
 
+const softDeleteProduct = async (req, res) => {
+  const productId = req.params.id;
+  console.log(req.params,';;;;;;;;;;;;;');
 
+
+  try {
+    console.log(productId,'....................');
+    const product = await products.findById(productId);
+    console.log(product,'12563uihabhhhfhjksbdafk;jber8tgaedsa fiq34ytgifuaewbto87734tguiwvbe8134tuij');
+
+    if (!product) {
+      return res.status(404).send('Product not found');
+    }
+
+    const result = await products.findByIdAndUpdate(
+      productId,
+      { isDeleted: true },
+      { new: true }
+    );
+
+    res.redirect('/admin/products');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
+const offerpage= async(req,res)=>{
+  try {
+    const productData= await products.find()
+res.render('./admin/offerse',{productData})
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
+
+const addoffer = async (req, res) => {
+  console.log('.///////////////////////.///////////////////.///////');
+  try {
+      const productId = req.params.id;
+      
+      const { discountPercentage, startDate, endDate } = req.body;
+
+      const product = await products.findById(productId);
+
+      if (!product) {
+          return res.json({ success: false, error: 'Product not found' });
+      }
+
+      product.offer = {
+          discountPercentage,
+          startDate,
+          endDate,
+      };
+
+      await product.save();
+   console.log(product,'===============||||||||||||||||');
+      res.json({ success: true, message: 'Offer added successfully' });
+  } catch (error) {
+      console.error(error);
+      res.json({ success: false, error: 'Internal Server Error' });
+  }
+};
 
 
 
@@ -273,4 +368,9 @@ module.exports = {
   editproduct,
   updateProduct,
   blockproducts,
+  checkStock,
+  softDeleteProduct,
+  offerpage,
+  addoffer
+  
 };
