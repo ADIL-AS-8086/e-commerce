@@ -34,6 +34,7 @@
         <div class="card-header">
           <form class="row g-3" method="POST" action="/admin/addproduct" enctype="multipart/form-data">
             <h2>Add Products</h2>
+            <span class="alert alert-danger text-danger" id="errorContainer"></span>
             <!-- Product Details Fields -->
             <div class="col-md-6">
               <label for="productname" class="form-label">Product Name</label>
@@ -54,7 +55,7 @@
             </div>
             <div class="col-md-6">
               <label for="price" class="form-label">Price</label>
-              <input type="number" class="form-control" name="price" id="price" required min="0">
+              <input type="number" class="form-control" name="price" id="price" required>
             </div>
 
 
@@ -88,7 +89,7 @@
                 </div>
                 <div class="col-md-6">
                   <label for="productStock" class="form-label">Stock Quantity</label>
-                  <input type="number" class="form-control" name="variant[quantity][]" placeholder="Stock" required min="0">
+                  <input type="number" class="form-control" name="variant[quantity][]" placeholder="Stock" required>
                 </div>
                 <!-- Remove Variant Icon -->
                 <div class="col-md-12 mt-2 d-flex justify-content-end">
@@ -320,72 +321,136 @@
 //   }
 
   
-
-
-
 document.addEventListener('DOMContentLoaded', function () {
-    const form = document.querySelector('form');
+        const form = document.querySelector('form');
 
-    form.addEventListener('submit', function (event) {
-        event.preventDefault();
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
 
-        const productName = document.getElementById('productname').value.trim().toLowerCase();
-        if (productName === '' || productName.includes('black')) {
-            displayValidationMessage('Please enter a valid product name.');
-            return;
-        }
-
-        const colour = document.getElementById('colour').value.trim();
-        if (colour === '' || /\d/.test(colour)) {
-            displayValidationMessage('Please enter a valid colour (text only, no numbers).');
-            return;
-        }
-
-        const price = document.getElementById('price').value.trim();
-        if (price === '' || isNaN(price) || parseFloat(price) < 0) {
-            displayValidationMessage('Please enter a valid price (at least 0).');
-            return;
-        }
-
-        const variants = document.querySelectorAll('#variantSection .variant-row');
-        if (variants.length === 0) {
-            displayValidationMessage('Please add at least one variant.');
-            return;
-        }
-
-        for (const variant of variants) {
-            const size = variant.querySelector('input[name="variant[size][]"]').value.trim();
-            if (size === '') {
-                displayValidationMessage('Please enter a valid size for all variants.');
+            const productName = document.getElementById('productname').value.trim().toLowerCase();
+            if (productName === '' || productName.includes('black')) {
+                displayValidationMessage('Please enter a valid product name.');
                 return;
             }
 
-            const quantity = variant.querySelector('input[name="variant[quantity][]"]').value.trim();
-            if (quantity === '' || isNaN(quantity) || parseInt(quantity) < 0) {
-                displayValidationMessage('Please enter a valid quantity for all variants (at least 0).');
+            const colour = document.getElementById('colour').value.trim();
+            if (colour === '' || /\d/.test(colour)) {
+                displayValidationMessage('Please enter a valid colour (text only, no numbers).');
                 return;
             }
-        }
 
-        form.submit();
+            const price = document.getElementById('price').value.trim();
+            if (price === '' || isNaN(price) || parseFloat(price) < 0) {
+                displayValidationMessage('Please enter a valid price (at least 0).');
+                return;
+            }
+
+            const variants = document.querySelectorAll('#variantSection .variant-row');
+            if (variants.length === 0) {
+                displayValidationMessage('Please add at least one variant.');
+                return;
+            }
+
+            for (const variant of variants) {
+                const size = variant.querySelector('input[name="variant[size][]"]').value.trim();
+                if (size === '') {
+                    displayValidationMessage('Please enter a valid size for all variants.');
+                    return;
+                }
+
+                const quantity = variant.querySelector('input[name="variant[quantity][]"]').value.trim();
+                if (quantity === '' || isNaN(quantity) || parseInt(quantity) < 0) {
+                    displayValidationMessage('Please enter a valid quantity for all variants (at least 0).');
+                    return;
+                }
+            }
+
+            form.submit();
+        });
+
+        function displayValidationMessage(message) {
+            const errorContainer = document.getElementById('errorContainer');
+
+            // Clear existing error messages
+            errorContainer.innerHTML = '';
+
+            // Create a span element for the error message
+            const errorMessage = document.createElement('span');
+            errorMessage.classList.add('error-message');
+            errorMessage.textContent = message;
+
+            // Append the span to the error container
+            errorContainer.appendChild(errorMessage);
+
+            // Optional: You can add styling or animations to make the error messages more noticeable
+        }
     });
 
-    function displayValidationMessage(message) {
-        const existingAlerts = document.querySelectorAll('.alert');
-        existingAlerts.forEach(alert => alert.remove());
 
-        const validationMessage = document.createElement('div');
-        validationMessage.classList.add('alert', 'alert-danger', 'mt-3');
-        validationMessage.textContent = message;
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     const form = document.querySelector('form');
+
+//     form.addEventListener('submit', function (event) {
+//         event.preventDefault();
+
+//         const productName = document.getElementById('productname').value.trim().toLowerCase();
+//         if (productName === '' || productName.includes('black')) {
+//             displayValidationMessage('Please enter a valid product name.');
+//             return;
+//         }
+
+//         const colour = document.getElementById('colour').value.trim();
+//         if (colour === '' || /\d/.test(colour)) {
+//             displayValidationMessage('Please enter a valid colour (text only, no numbers).');
+//             return;
+//         }
+
+//         const price = document.getElementById('price').value.trim();
+//         if (price === '' || isNaN(price) || parseFloat(price) < 0) {
+//             displayValidationMessage('Please enter a valid price (at least 0).');
+//             return;
+//         }
+
+//         const variants = document.querySelectorAll('#variantSection .variant-row');
+//         if (variants.length === 0) {
+//             displayValidationMessage('Please add at least one variant.');
+//             return;
+//         }
+
+//         for (const variant of variants) {
+//             const size = variant.querySelector('input[name="variant[size][]"]').value.trim();
+//             if (size === '') {
+//                 displayValidationMessage('Please enter a valid size for all variants.');
+//                 return;
+//             }
+
+//             const quantity = variant.querySelector('input[name="variant[quantity][]"]').value.trim();
+//             if (quantity === '' || isNaN(quantity) || parseInt(quantity) < 0) {
+//                 displayValidationMessage('Please enter a valid quantity for all variants (at least 0).');
+//                 return;
+//             }
+//         }
+
+//         form.submit();
+//     });
+
+//     function displayValidationMessage(message) {
+//         const existingAlerts = document.querySelectorAll('.alert');
+//         existingAlerts.forEach(alert => alert.remove());
+
+//         const validationMessage = document.createElement('div');
+//         validationMessage.classList.add('alert', 'alert-danger', 'mt-3');
+//         validationMessage.textContent = message;
 
    
-        form.appendChild(validationMessage);
+//         form.appendChild(validationMessage);
 
-        setTimeout(function () {
-            validationMessage.remove();
-        }, 4000);
-    }
-});
+//         setTimeout(function () {
+//             validationMessage.remove();
+//         }, 4000);
+//     }
+// });
 
 
 </script>

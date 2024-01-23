@@ -21,21 +21,28 @@ const cartpage = async (req, res) => {
 
         console.log(userCart);
 
-        let totalAmount = 0; // Initialize totalAmount variable
+        let totalAmount = 0;
 
         if (userCart && userCart.cartItems) {
-            userCart.cartItems.forEach(item => {
-                item.totalPrice = item.quantity * item.products.price;
-                totalAmount += item.totalPrice; 
+            userCart.cartItems.forEach(async (item) => {
+                if (item.products && item.products.price) {
+                    let productPrice = item.products.price;
+
+       
+                    if (item.products.offer && item.products.offer.discountPercentage > 0) {
+                        productPrice = item.products.Discountedprice;
+                    }
+
+                    item.totalPrice = item.quantity * productPrice;
+                    totalAmount += item.totalPrice;
+                }
             });
 
-            userCart.TotalAmount = totalAmount; 
-            console.log(userCart.TotalAmount,'88888888888888888');
-            
+            userCart.TotalAmount = totalAmount;
+            console.log(userCart.TotalAmount, '88888888888888888');
         }
 
-        await userCart.save(); 
-        
+        await userCart.save();
 
         res.render('./user/userCart', { userCart });
     } catch (error) {
@@ -44,12 +51,14 @@ const cartpage = async (req, res) => {
     }
 };
 
+
+
 const addToCart_post = async (req, res) => {
     try {
         const productId = req.params.id;
-        const { size,sizeId } = req.body;
+        const { size, sizeId } = req.body;
         const email = req.session.email;
-        console.log(size,'----?-??_??_____',sizeId);
+        console.log(size, '----?-??_??_____', sizeId);
         const userData = await User.findOne({ email });
 
         if (!userData) {
@@ -67,31 +76,46 @@ const addToCart_post = async (req, res) => {
         const existingItem = userCart.cartItems.find(item => {
             return item.products.equals(new mongoose.Types.ObjectId(productId)) && item.size === size;
         });
-       
 
         if (existingItem) {
             const product = await products.findById(productId);
-            
+
             if (product) {
                 const variant = product.variant.find(v => v.size === size);
                 if (variant && existingItem.quantity + 1 > variant.quantity) {
                     return res.status(400).json({ error: 'Not enough stock available for the selected size.' });
                 }
+
+                if (product.offer && product.offer.discountPercentage > 0) {
+                    existingItem.price = product.Discountedprice; 
+                } else {
+                    existingItem.price = product.price; 
+                }
             }
 
             existingItem.quantity += 1;
         } else {
+            const product = await products.findById(productId);
+
+            if (!product) {
+                return res.status(404).json({ error: 'Product not found.' });
+            }
+
+            const offerPrice = product.offer && product.offer.discountPercentage > 0
+                ? product.Discountedprice 
+                : product.price; 
+
             userCart.cartItems.push({
                 products: new mongoose.Types.ObjectId(productId),
                 quantity: 1,
                 size: size,
-            
+                price: offerPrice,
             });
         }
 
         await userCart.save();
 
-        console.log(userCart)
+        console.log(userCart);
 
         res.status(200).json({ message: 'Item added to the cart successfully.' });
     } catch (error) {

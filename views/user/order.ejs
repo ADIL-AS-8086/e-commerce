@@ -38,35 +38,90 @@
                                         </h6>
                                     </div>
                                     <div class="text-container">
+
                                         <p class="stock-container">
                                             <%= item.quantity %> pcs
                                         </p>
                                     </div>
                                     <div class="text-container">
-                                        <p class="price-container">
-                                            <%= item.productId.price %>
-                                        </p>
+                                        <% if (item.offer) { %>
+                                            <p class="price-container">
+                                                <span style="background-color: yellow; color: black;">
+                                                    <%= item.orderingprice %>
+                                                </span>
+                                            </p>
+                                            <p class="price-container">
+                                                <span
+                                                    style="background-color: yellow; color: black; margin-left: 100px; ">
+                                                    <%= item.offer %>%
+                                                </span>
+                                            </p>
+
+                                            <p class="price-container"
+                                                style="text-decoration: line-through; margin-left: 380px; ">
+                                                <%= item.productId.price %>
+                                            </p>
+
+                                            <% } else { %>
+                                                <p class="price-container" style="font-weight: bold;">
+                                                    <%= item.orderingprice %>
+                                                </p>
+                                                <% } %>
                                     </div>
                                     <div class="text-container">
                                         <p class="total-container">
-                                            <%= item.quantity * item.productId.price %>
+                                            <%= item.quantity * item.orderingprice %>
                                         </p>
+
+
                                         <p style="font-weight: bold;">orderID :<%= order._id %>
                                         </p>
-                                        <% if (order.Status !== 'cancelled') { %>
-                                            <% if (order.Status !== 'rejected') { %>
-                                                <% if (order.Status !== 'delivered') { %>
-                                                    <button type="button" class="btns cancel-order-btn" data-order-id="<%= order._id %>">
-                                                        <span><i class="fa-solid fa-ban fa-beat" style="color: #000000;"></i></span>CANCEL ORDER
+                                        <% if (order.Status !=='cancelled' ) { %>
+                                            <% if (order.Status !=='rejected' ) { %>
+                                                <% if (order.Status !=='delivered' ) { %>
+                                                    <button type="button" class="btns cancel-order-btn"
+                                                        data-order-id="<%= order._id %>">
+                                                        <span><i class="fa-solid fa-ban fa-beat"
+                                                                style="color: #000000;"></i></span>CANCEL ORDER
                                                     </button>
-                                                <% } else { %>
-                                                    <button type="button" class="btns return-order-btn" data-order-id="<%= order._id %>">
-                                                        <span style="margin-left: 10px;"><i class="fa-solid fa-right-left" style="color: #000000;"></i></span>RETURN ORDER
-                                                    </button>
-                                                <% } %>
-                                            <% } %>
-                                        <% } %>
-                                        
+                                                    <% } else { %>
+                                                        <button type="button" class="btns return-order-btn" data-bs-toggle="modal" data-bs-target="#returnOrderModal<%= order._id %>">
+
+                                                            <span style="margin-left: 10px;"><i
+                                                                    class="fa-solid fa-right-left"
+                                                                    style="color: #000000;"></i></span>RETURN ORDER
+                                                        </button>
+
+                                                        <br><br>  <button type="button" class="btn btn-dark m-2" onclick="generateAndDownloadInvoice('<%= order._id %>')">
+                                                            Download Invoice
+                                                        </button>
+
+                                                               
+
+                            <div class="modal fade" id="returnOrderModal<%= order._id %>"  data-bs-keyboard="false" tabindex="-1" aria-labelledby="returnOrderModalLabel" aria-hidden="true">
+                                <div class="modal-dialog ">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="returnOrderModalLabel">Return Order</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <label for="returnReason">Reason for Return:</label>
+                                      <textarea id="returnReason<%= order._id %>" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                      <button type="button" class="btn btn-primary" onclick="submitReturn('<%= order._id %>')">Submit Return</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+
+                                                        <% } %>
+                                                            <% } %>
+                                                                <% } %>
+
                                     </div>
                                     <% }); %>
                                         <% } else { %>
@@ -79,6 +134,17 @@
                                                         <span>DELIVERY</span>: Free
                                                     </p>
                                                 </div>
+
+
+
+                                                <span style="margin-left: 30px; font-weight: bold;">PaymentMethod :
+                                                    <%=order.PaymentMethod%></span><br>
+                                                <span style="margin-left: 30px; font-weight: bold;">PaymentStatus : <%=
+                                                        order.PaymentStatus%></span>
+
+
+
+
 
                                                 <hr>
                                                 <div class="text-container">
@@ -108,8 +174,8 @@
                                                      <span
                                                         class="d-flex justify-content-center align-items-center big-dot dot">
                                                         <i class="fa fa-check text-white"></i></span> -->
-                                                        <!-- <%}%> -->
-                                                    <!-- <span class="dot"></span>
+                                                <!-- <%}%> -->
+                                                <!-- <span class="dot"></span>
                                                     <hr class="flex-fill track-line"><span class="dot"></span>
                                                     <hr class="flex-fill track-line"><span class="dot"></span>
                                                     <hr class="flex-fill track-line"><span class="dot"></span>
@@ -117,105 +183,127 @@
                                                     <hr class="flex-fill track-line"><span
                                                         class="d-flex justify-content-center align-items-center big-dot dot">
                                                         <i class="fa fa-check text-white"></i></span> -->
-                                                <!-- </div> --> 
-                                                <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
- 
-                                                    <% if (order.Status === 'rejected') { %>
-                                                       
+                                                <!-- </div> -->
+                                                <div
+                                                    class="d-flex flex-row justify-content-between align-items-center align-content-center">
+
+                                                    <% if (order.Status==='rejected' ) { %>
+
                                                         <span class="dot"></span>
                                                         <hr class="flex-fill track-line"><span class="dot"></span>
                                                         <hr class="flex-fill track-line"><span class="dot"></span>
                                                         <hr class="flex-fill track-line"><span class="dot"></span>
                                                         <hr class="flex-fill track-line"><span class="dot"></span>
-                                                         <p style="margin-top: 0px; font-weight: bolder;">order cancled by admin</p>
-                                                    <%} else if (order.Status === 'Order Placed') { %>
-                                                        <span class="dot"></span>
-                                                        <hr class="flex-fill"><span class="dot"></span>
-                                                        <hr class="flex-fill"><span class="dot"></span>
-                                                        <hr class="flex-fill"><span class="dot"></span>
-                                                        <hr class="flex-fill">
-                                                    <% } else if (order.Status === 'processing') { %>
-                                                        <span class="dot"></span>
-                                                        <hr class="flex-fill track-line"><span class="dot"></span>
-                                                        <hr class="flex-fill"><span class="dot"></span>
-                                                        <hr class="flex-fill"><span class="dot"></span>
-                                                        <hr class="flex-fill">
-                                                    <% } else if (order.Status === 'packed') { %>
-                                                        <span class="dot"></span>
-                                                        <hr class="flex-fill track-line"><span class="dot"></span>
-                                                        <hr class="flex-fill track-line"><span class="dot"></span>
-                                                        <hr class="flex-fill"><span class="dot"></span>
-                                                        <hr class="flex-fill">
-                                                    <% } else if (order.Status === 'shipped') { %>
-                                                        <span class="dot"></span>
-                                                        <hr class="flex-fill track-line"><span class="dot"></span>
-                                                        <hr class="flex-fill track-line"><span class="dot"></span>
-                                                        <hr class="flex-fill track-line"><span class="dot"></span>
-                                                        <hr class="flex-fill">
-                                                    <% } else if (order.Status === 'delivered') { %>
-                                                        <span class="dot"></span>
-                                                        <hr class="flex-fill track-line"><span class="dot"></span>
-                                                        <hr class="flex-fill track-line"><span class="dot"></span>
-                                                        <hr class="flex-fill track-line"><span class="dot"></span>
-                                                       <hr class="flex-fill track-line">
-                                                        <span
-                                                        class="d-flex justify-content-center align-items-center big-dot dot"> 
-                                                        <i class="fa fa-check text-white"></i></span> 
-                                                        
-                                                    <% } %>
-                                                
+                                                        <p style="margin-top: 0px; font-weight: bolder;">order cancled
+                                                            by admin</p>
+                                                        <%} else if (order.Status==='Order Placed' ) { %>
+                                                            <span class="dot"></span>
+                                                            <hr class="flex-fill"><span class="dot"></span>
+                                                            <hr class="flex-fill"><span class="dot"></span>
+                                                            <hr class="flex-fill"><span class="dot"></span>
+                                                            <hr class="flex-fill">
+                                                            <% } else if (order.Status==='processing' ) { %>
+                                                                <span class="dot"></span>
+                                                                <hr class="flex-fill track-line"><span
+                                                                    class="dot"></span>
+                                                                <hr class="flex-fill"><span class="dot"></span>
+                                                                <hr class="flex-fill"><span class="dot"></span>
+                                                                <hr class="flex-fill">
+                                                                <% } else if (order.Status==='packed' ) { %>
+                                                                    <span class="dot"></span>
+                                                                    <hr class="flex-fill track-line"><span
+                                                                        class="dot"></span>
+                                                                    <hr class="flex-fill track-line"><span
+                                                                        class="dot"></span>
+                                                                    <hr class="flex-fill"><span class="dot"></span>
+                                                                    <hr class="flex-fill">
+                                                                    <% } else if (order.Status==='shipped' ) { %>
+                                                                        <span class="dot"></span>
+                                                                        <hr class="flex-fill track-line"><span
+                                                                            class="dot"></span>
+                                                                        <hr class="flex-fill track-line"><span
+                                                                            class="dot"></span>
+                                                                        <hr class="flex-fill track-line"><span
+                                                                            class="dot"></span>
+                                                                        <hr class="flex-fill">
+                                                                        <% } else if (order.Status==='delivered' ) { %>
+                                                                            <span class="dot"></span>
+                                                                            <hr class="flex-fill track-line"><span
+                                                                                class="dot"></span>
+                                                                            <hr class="flex-fill track-line"><span
+                                                                                class="dot"></span>
+                                                                            <hr class="flex-fill track-line"><span
+                                                                                class="dot"></span>
+                                                                            <hr class="flex-fill track-line">
+                                                                            <span
+                                                                                class="d-flex justify-content-center align-items-center big-dot dot">
+                                                                                <i
+                                                                                    class="fa fa-check text-white"></i></span>
+
+                                                                            <% } %>
+
                                                 </div>
-                                                
+
 
                                                 <div class="d-flex flex-row justify-content-between align-items-center">
-                                                    <% if (order.Status !== 'cancelled') { %>
-                                                    <% if (order.Status !== 'rejected') { %>
-                                                      <div class="d-flex flex-column align-items-start">
-                                                        <span>
-                                                          <% var dt = new Date(order.OrderDate); %>
-                                                          <%= dt.getDate() %>/<%= dt.getMonth() + 1 %>/<%= dt.getFullYear() %>
-                                                        </span>
-                                                        <span>
-                                                          <i class="fa-solid fa-cart-plus"></i><span style="font-weight: bold;">Order placed</span>
-                                                        </span>
-                                                      </div>
-                                                  
-                                                      <div class="d-flex flex-column justify-content-center">
-                                                        <span></span>
-                                                        <span>
-                                                          <i class="fa-solid fa-arrows-rotate"></i><span style="font-weight: bold;">processing</span>
-                                                        </span>
-                                                      </div>
-                                                  
-                                                      <div class="d-flex flex-column justify-content-center align-items-center">
-                                                        <span></span>
-                                                        <span>
-                                                          <i class="fa-solid fa-cubes-stacked"></i><span style="font-weight: bold;">Packed</span>
-                                                        </span>
-                                                      </div>
-                                                  
-                                                      <div class="d-flex flex-column align-items-center">
-                                                        <span></span>
-                                                        <span>
-                                                          <i class="fa-solid fa-truck-fast"></i><span style="font-weight: bold;">shipped</span>
-                                                        </span>
-                                                      </div>
-                                                  
-                                                      <div class="d-flex flex-column align-items-end">
-                                                        <span>
-                                                          <% var dt = new Date(order.DeliveryDate); %>
-                                                          <%= dt.getDate() %>/<%= dt.getMonth() + 1 %>/<%= dt.getFullYear() %>
-                                                        </span>
-                                                        <span>
-                                                          <i class="fa-solid fa-check"></i><span style="font-weight: bold;">Delivered</span>
-                                                        </span>
-                                                      </div>
-                                                    <% } %>
-                                                    <% } else { %>
-                                                        <p class="ordrercanceltext">ORDER CANCELELLED BY YOU </p>
-                                                      <% } %>
-                                                  </div>
-                                                  
+                                                    <% if (order.Status !=='cancelled' ) { %>
+                                                        <% if (order.Status !=='rejected' ) { %>
+                                                            
+                                                            <div class="d-flex flex-column align-items-start">
+                                                                <span>
+                                                                    <% var dt=new Date(order.OrderDate); %>
+                                                                        <%= dt.getDate() %>/<%= dt.getMonth() + 1 %>/<%=
+                                                                                    dt.getFullYear() %>
+                                                                </span>
+                                                                <span>
+                                                                    <i class="fa-solid fa-cart-plus"></i><span
+                                                                        style="font-weight: bold;">Order placed</span>
+                                                                </span>
+                                                            </div>
+
+                                                            <div class="d-flex flex-column justify-content-center">
+                                                                <span></span>
+                                                                <span>
+                                                                    <i class="fa-solid fa-arrows-rotate"></i><span
+                                                                        style="font-weight: bold;">processing</span>
+                                                                </span>
+                                                            </div>
+
+                                                            <div
+                                                                class="d-flex flex-column justify-content-center align-items-center">
+                                                                <span></span>
+                                                                <span>
+                                                                    <i class="fa-solid fa-cubes-stacked"></i><span
+                                                                        style="font-weight: bold;">Packed</span>
+                                                                </span>
+                                                            </div>
+
+                                                            <div class="d-flex flex-column align-items-center">
+                                                                <span></span>
+                                                                <span>
+                                                                    <i class="fa-solid fa-truck-fast"></i><span
+                                                                        style="font-weight: bold;">shipped</span>
+                                                                </span>
+                                                            </div>
+
+                                                            <div class="d-flex flex-column align-items-end">
+                                                                <span>
+                                                                    <% var dt=new Date(order.DeliveryDate); %>
+                                                                        <%= dt.getDate() %>/<%= dt.getMonth() + 1 %>/<%=
+                                                                                    dt.getFullYear() %>
+                                                                </span>
+                                                                <span>
+                                                                    <i class="fa-solid fa-check"></i><span
+                                                                        style="font-weight: bold;">Delivered</span>
+                                                                </span>
+                                                            </div>
+                                                            <% } %>
+                                                                <% } else { %>
+                                                                    <p class="ordrercanceltext">ORDER CANCELELLED BY YOU
+                                                                    </p>
+                                                                    <% } %>
+                                                </div>
+
                         </div>
                     </div>
                 </div>
@@ -246,13 +334,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             console.log('.........................,,,,,,,,,,,,mmmmmmmmmmmmmmmmzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz');
-          
+
             const cancelOrderButtons = document.querySelectorAll('.cancel-order-btn');
-    
+
             cancelOrderButtons.forEach(button => {
                 button.addEventListener('click', function () {
                     const orderId = button.getAttribute('data-order-id');
-    
+
                     // Use SweetAlert for confirmation
                     Swal.fire({
                         title: 'Are you sure?',
@@ -264,44 +352,130 @@
                         confirmButtonText: 'Yes, cancel it!'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // User confirmed, send cancellation request
                             fetch(`/user/cancel-order/${orderId}`, {
                                 method: 'PATCH',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
                             })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log(data);
-    
-                                // Show success message with SweetAlert
-                                Swal.fire({
-                                    title: 'Order Cancelled!',
-                                    text: 'Your order has been cancelled successfully.',
-                                    icon: 'success'
-                                }).then(() => {
-                                    // Reload the page after success
-                                    location.reload();
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log(data);
+
+                                    Swal.fire({
+                                        title: 'Order Cancelled!',
+                                        text: 'Your order has been cancelled successfully.',
+                                        icon: 'success'
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+
+                                    if (data.success) {
+                                        Toastify({
+                                            text:"Amount Refunded to Wallet ",
+                                            className: "info",
+                                            position: 'center',
+                                            gravity: "top",
+                                            duration: 3000,
+                                            style: {
+                                                background: "white",
+                                                color: "#000",
+                                                marginTop: "80px",
+                                            }
+                                        }).showToast();
+
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error cancelling order:', error);
+
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'An error occurred while cancelling the order. Please try again later.',
+                                        icon: 'error'
+                                    });
                                 });
-                            })
-                            .catch(error => {
-                                console.error('Error cancelling order:', error);
-    
-                                // Show error message with SweetAlert
-                                Swal.fire({
-                                    title: 'Error!',
-                                    text: 'An error occurred while cancelling the order. Please try again later.',
-                                    icon: 'error'
-                                });
-                            });
                         }
                     });
                 });
             });
         });
+
+
+        function submitReturn(orderIdParam) {
+    const returnReason = document.getElementById(`returnReason${orderIdParam}`).value;
+    const orderId = orderIdParam; 
+console.log(returnReason);
+    fetch('/user/submitreturn', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        orderId: orderId,
+        returnReason: returnReason,
+      }),
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        
+        location.reload();
+      })
+      .catch((error) => {
+        console.error('Error submitting return reason:', error);
+      });
+
+    $('#returnOrderModal').modal('hide');
+  }
+
+
+
+  async function generateAndDownloadInvoice(orderId) {
+    let timerInterval
+Swal.fire({
+  title: 'Download Started!',
+  html: 'I will close in <b></b> milliseconds.',
+  timer: 4000,
+  timerProgressBar: true,
+  didOpen: () => {
+    Swal.showLoading()
+    const b = Swal.getHtmlContainer().querySelector('b')
+    timerInterval = setInterval(() => {
+      b.textContent = Swal.getTimerLeft()
+    }, 100)
+  },
+  willClose: () => {
+    clearInterval(timerInterval)
+  }
+}).then((result) => {
+  if (result.dismiss === Swal.DismissReason.timer) {
+    console.log('I was closed by the timer')
+  }
+})
+
+      try {
+          const response = await fetch('/downloadinvoice', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json', 
+              },
+              body: JSON.stringify({ orderId }) 
+          });
+          if (response.ok) {
+            
+              window.location.href = `/downloadinvoice/${orderId}`;
+          }
+      } catch (error) {
+          console.error('Error in downloading the invoice:', error);
+      }
+  }
+
+
+
+
+
     </script>
-    
+
 
 
     <%- include('../partials/userlogfoter')%>

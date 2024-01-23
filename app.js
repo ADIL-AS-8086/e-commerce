@@ -11,7 +11,7 @@ const morgan=require('morgan')
 const { v4: uuidv4 } = require('uuid');
 const app = express();
 const multer = require("multer");
-const port = process.env.PORT || 4000;
+const port = process.env.PORT;
 const host=process.env.HOST
 connectDB=require('./config/connectionDB')
 // const FileType = require('file-type');
@@ -34,13 +34,17 @@ app.use(bodyParser.urlencoded({extended:true}))
 app.use(bodyParser.json())
 //
 app.use(
-    session({
-      secret: uuidv4(),
-      resave: false,
-      saveUninitialized: true,
-    })      
+  session({
+    secret: uuidv4(),
+    resave: false,
+    saveUninitialized: true,
+  })      
   );
+  
+  app.use(flash());
 
+
+  
 const userRouter=require("./routes/userRoutes")
 const adminRouter=require("./routes/adminRoutes");
 
@@ -54,6 +58,15 @@ const adminRouter=require("./routes/adminRoutes");
 
 app.use('/',userRouter)
 app.use('/admin', adminRouter);
+
+
+
+
+
+
+
+
+
 
 // Start the server
 app.listen(port, () => {

@@ -28,7 +28,7 @@
 </style>
 
 
-<div class="container mt-5" style="margin-left: 240px; max-width: 1000px;">
+<div class="container mt-5" style="margin-left: 200px; max-width: 950px;">
   <div class="card bg-white shadow">
     <div class="card-header">
       <div class="d-flex justify-content-between align-items-center" style="font-weight: bolder;">
@@ -80,7 +80,18 @@
                     <span style="color: #007BFF;"><%= productData[i].variant[j].quantity %></span><br>
                   <% } %>
                 </td>
-                <td style="font-weight: bold;"><%= productData[i].price %></td>
+
+                <td style="font-weight: bold;">
+                  <% if (productData[i].offer && productData[i].offer.discountPercentage > 0) { %>
+                      <%= productData[i].Discountedprice %>
+                      <p style="font-weight: bolder; display: inline-block; background-color: yellow; color: black;">
+                      <%= productData[i].offer.discountPercentage %>% Off</p>
+                  <% } else { %>
+                      <%= productData[i].price %>
+                  <% } %>
+              </td>
+              
+
                 <td style="font-weight: bold;"><%= productData[i].brand %></td>
                 <td >
                   <a style="  text-decoration: none; color: #000; font-weight: bold;" href="/admin/editproduct/<%= productData[i]._id %>">

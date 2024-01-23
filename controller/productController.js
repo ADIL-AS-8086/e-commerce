@@ -264,7 +264,7 @@ const checkStock = async (req, res) => {
       const productsToCheck = JSON.parse(req.body.products);
 
       for (const productInfo of productsToCheck) {
-          const product = await Product.findById(productInfo.productId);
+          const product = await products.findById(productInfo.productId);
           
           if (!product) {
               return res.json({ success: false, error: "Product not found." });
@@ -319,7 +319,8 @@ const softDeleteProduct = async (req, res) => {
 
 const offerpage= async(req,res)=>{
   try {
-    const productData= await products.find()
+    const productData= await products.find( { isDeleted: false })
+      console.log(productData,'AAAAAAAAAAAFFFFFFFFFFFFFFFFFFSSSSSSSSSSSSSSSSSAAAAAAAAAAAAAAAAAAAAAAAALLLLLLLLLLLLLLLLLLLLLLL');
 res.render('./admin/offerse',{productData})
     
   } catch (error) {
@@ -330,32 +331,67 @@ res.render('./admin/offerse',{productData})
 
 
 const addoffer = async (req, res) => {
-  console.log('.///////////////////////.///////////////////.///////');
   try {
-      const productId = req.params.id;
-      
-      const { discountPercentage, startDate, endDate } = req.body;
+    const productId = req.params.id;
+    const { discountPercentage, startDate, endDate } = req.body;
 
-      const product = await products.findById(productId);
+    const product = await products.findById(productId);
 
-      if (!product) {
-          return res.json({ success: false, error: 'Product not found' });
-      }
+    if (!product) {
+      return res.json({ success: false, error: 'Product not found' });
+    }
 
-      product.offer = {
-          discountPercentage,
-          startDate,
-          endDate,
-      };
+    const discountedPrice = Math.round(product.price - (product.price * discountPercentage / 100));
 
-      await product.save();
-   console.log(product,'===============||||||||||||||||');
-      res.json({ success: true, message: 'Offer added successfully' });
+    product.offer = {
+      discountPercentage,
+      startDate,
+      endDate,
+    };
+
+    product.Discountedprice = discountedPrice;
+
+    await product.save();
+
+    res.json({ success: true, message: 'Offer added successfully' });
   } catch (error) {
-      console.error(error);
-      res.json({ success: false, error: 'Internal Server Error' });
+    console.error(error);
+    res.json({ success: false, error: 'Internal Server Error' });
   }
 };
+
+
+const deleteoffer=async(req,res)=>{
+  try {
+    const productId = req.params.id;
+
+    const product = await products.findById(productId);
+
+    if (!product || !product.offer) {
+        return res.json({ success: false, error: 'Offer not found for the product' });
+    }
+
+    // Remove the offer details
+    product.offer = undefined;
+    product.Discountedprice = undefined;
+
+    await product.save();
+
+
+    res.status(200)
+
+res.redirect('/admin/offer-list')
+} catch (error) {
+    console.error(error);
+    res.json({ success: false, error: 'Internal Server Error' });
+}
+};
+
+
+
+
+
+
 
 
 
@@ -371,6 +407,8 @@ module.exports = {
   checkStock,
   softDeleteProduct,
   offerpage,
-  addoffer
+  addoffer,
+  deleteoffer,
+  
   
 };

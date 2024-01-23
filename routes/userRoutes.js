@@ -6,11 +6,13 @@ const uploadProfile=require('../middleware/profilemulter')
 
 const cartController=require('../controller/cartcontroller')
 
+const referralController=require('../controller/refferalController')
+const productController=require("../controller/productController")
 
 
 const orderController=require('../controller/ordercontroller')
-
-
+const couponController=require('../controller/couponController')
+const wishlistController=require('../controller/wishlsitController')
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 
 
@@ -23,6 +25,7 @@ router.get('/user/otpuser',userAuth.userExist,userController.otppage);
 router.post('/user/for-got-pass-word',userAuth.userExist,userController.forgotpassword)
 router.post('/user/verifyPasswordOtp',userAuth.userExist,userController.forgetPassOtpVerification)
 router.get('/user/forgetPass',userAuth.userExist,userController.toforget)
+router.post('/user/resendotp', userAuth.userExist,userController. sendResendOTP);
 
 
 
@@ -81,16 +84,40 @@ router.get('/user/check-out', userAuth.verifyUser,orderController.checkoutpage)
 
 
 router.post('/user/placeOrder',userAuth.verifyUser,orderController.orderSuccess)
+
+
+
+
+
+router.post('/user/verify-payment',userAuth.verifyUser,orderController.verifyPayment)
+
 router.get('/user/ordersuccess',userAuth.verifyUser,orderController.successOrder)
 router.get('/user/order-history', userAuth.verifyUser, orderController.orderHistory);
 router.patch('/user/cancel-order/:orderId', userAuth.verifyUser,orderController.Cancelorderstatus);
 
+router.post('/user/submitreturn',userAuth.verifyUser,userController.submitReturn)
+
+
+
+router.get('/user/catogery-wise-page/:id', userAuth.verifyUser,userController.catogerywiseproductpage)
+
+router.get('/user/coupon-show', userAuth.verifyUser,couponController.showcoupon)
+router.post('/user/apply-coupon', userAuth.verifyUser, couponController.applyCoupon);
+
+
+router.get('/user/wallet-get',userAuth.verifyUser,referralController.getWallet)
 
 
 
 
+router.get('/user/wish-list',userAuth.verifyUser,wishlistController.wishlistpage)
+
+router.post('/user/addto-wishlist/:id',userAuth.verifyUser,wishlistController.addtowishlist)
 
 
-
+router.post('/user/productsfilter', userAuth.verifyUser, userController.ProductFilter);
+    
+router.post('/user/downloadinvoice',userAuth.verifyUser,userController.generateInvoices)
+router.get('/user/downloadinvoice/:orderId',userAuth.verifyUser,userController.downloadInvoice)
 
 module.exports = router;

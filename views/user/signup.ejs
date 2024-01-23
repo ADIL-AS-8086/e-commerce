@@ -53,6 +53,11 @@
                 
                   <button id="login-button" type="submit" class="btn btn-block form-control">SIGN UP</button>
               </div>
+              
+              <% if (referralId) { %>
+                <input type="hidden" name="referralId" value="<%= referralId %>">
+              <% } %>
+
               <div class="col-md-12 ">
                 <div class="login-or">
                   <hr class="hr-or">

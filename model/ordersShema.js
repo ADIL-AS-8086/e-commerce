@@ -28,7 +28,9 @@ const OrdersSchema = new Schema({
   Items: [{
      productId: { type: Schema.Types.ObjectId , ref: "products" },
      quantity: { type: Number },
-     size: {type: String} 
+     size: {type: String},
+     orderingprice:{type: Number},
+     offer:{type:Number}
   }],
   PaymentMethod: {type: String},
   ShippingMehtod:{type:String},

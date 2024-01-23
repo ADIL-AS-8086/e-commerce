@@ -34,7 +34,7 @@
                                         <div class="col-lg-5">
                                             <div class="me-lg-5">
                                                 <div class="d-flex">
-                                                    <img src="/productimages/<%= item.products.images[0].filename %>"
+                                                    <img src="/productimages/<%= item.products?.images[0].filename %>"
                                                         class="border rounded me-3"
                                                         style="width: 96px; height: 96px;" />
                                                     <div class="">
@@ -49,9 +49,24 @@
                                                         <p class="text-muted" style="font-weight: bold;">Colur: <span>
                                                                 <%= item.products.colour%>
                                                             </span></p>
-                                                        <p class="text-muted" style="font-weight: bold;">Price: <span>
-                                                                <%= item.products.price %>
-                                                            </span></p>
+                                                            <% if (item.products.offer && item.products.offer.discountPercentage > 0) { %>
+                                                                <div class="offer-container">
+                                                                    <p class="custom-p" style="font-weight: bolder; display: inline-block; background-color: yellow; color: black;">
+                                                                        ₹ <%= item.products.Discountedprice %>
+                                                                    </p>
+                                                                    <p class="custom-p" style="font-weight: bolder; display: inline-block; background-color: yellow; color: black;">
+                                                                        <%= item.products.offer.discountPercentage %>% Off
+                                                                    </p>
+                                                                    <p class="original-price" style="text-decoration: line-through; color: black; display: inline-block; margin-left: 5px;">
+                                                                        ₹ <%= item.products.price %>
+                                                                    </p>
+                                                                </div>
+                                                            <% } else { %>
+                                                                <p class="custom-p" style="margin-left: 40px; font-weight: bolder;">Price :₹ <%= item.products.price %></p>
+                                                            <% } %>
+                                                            
+                                                            
+                                                            
                                                     </div>
                                                 </div>
                                             </div>
@@ -117,20 +132,7 @@
                 <!-- summary -->
                 <% if (userCart && userCart.cartItems && userCart.cartItems.length> 0) { %>
                     <div class="col-lg-3">
-                        <div class="card mb-3 border shadow-0">
-                            <div class="card-body">
-                                <form>
-                                    <div class="form-group">
-                                        <label class="form-label">Have coupon?</label>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control border" name=""
-                                                placeholder="Coupon code" />
-                                            <button class="btn btn-light border">Apply</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                      
                         <div class="card shadow-0 border">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">

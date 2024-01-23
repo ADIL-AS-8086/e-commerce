@@ -22,6 +22,10 @@
 
 <script src="https://unpkg.com/js-image-zoom@0.4.1/js-image-zoom.js" type="application/javascript"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="path/to/jquery.min.js"></script>
+<script src="path/to/sweetalert.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/razorpay.js"></script>
+
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
@@ -87,14 +91,15 @@
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
+            <a class="nav-link mx-2 text-uppercase" href="/user/user-home">Home</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link mx-2 text-uppercase" aria-current="page" href="/user/shop">Shop</a>
           </li>
           <li class="nav-item">
             <a class="nav-link mx-2 text-uppercase" href="#">about</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link mx-2 text-uppercase" href="#">contact</a>
-          </li>
+         
         </ul>
 
         <form class="form-inline my-2 my-lg-0 ms-auto d-md-none d-sm-none d-lg-block">
@@ -124,11 +129,11 @@
                 style="color: #000000;"></i></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 text-uppercase" href="#"><i class="fa-solid fa-wallet me-1"
+            <a class="nav-link mx-2 text-uppercase" href="/user/wallet-get"><i class="fa-solid fa-wallet me-1"
                 style="color: #000000;"></i></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 text-uppercase" href="#"><i class="fa-solid fa-heart me-1"
+            <a class="nav-link mx-2 text-uppercase" href="/user/wish-list"><i class="fa-solid fa-heart me-1"
                 style="color: #000000;"></i></a>
           </li>
         </div>

@@ -5,8 +5,9 @@ const bcrypt = require('bcrypt');
 const Category = require('../model/categorySchema');
 const Product = require('../model/prodectSchema');
 const User = require('../model/userSchema');
-
-
+const referral= require('../model/refferalSchema')
+const WalletTransaction=require('../model/WalletSchema')
+const Order= require('../model/ordersShema')
 let _email;
 let _password;
 let _name;
@@ -39,6 +40,7 @@ const userHome = async (req, res) => {
   try {
     const categories = await Category.find({ isDeleted: false ,Status: true });
     const proctData = await Product.find({ isDeleted: false ,Status: true }).limit(8);
+    console.log(categories,'.........');
     res.render('./user/homeuser', {
       category: categories, proctData
     });
@@ -55,7 +57,9 @@ const loginpage = (req, res) => {
   res.render('./user/signin', { message: false });
 };
 const signuppage = (req, res) => {
-  res.render('./user/signup');
+  const referralId = req.query.ref;
+  console.log("@@@@@@@@@@@@@",referralId,"#############");
+  res.render('./user/signup',{referralId});
 };
 const signup = async (req, res) => {
   try {
@@ -66,8 +70,10 @@ const signup = async (req, res) => {
     const data = {
       name: req.session.body,
       email: req.session.body,
-      password: req.session.body
-    }
+      password: req.session.body,
+        }
+        req.session.referralId= req.body.referralId;
+        console.log("@@@@@@###########@@@@@@@@@",req.session.referralId);
 
     const userExist = await user.findOne({ email: email });
 
@@ -135,6 +141,30 @@ const verifyOTP = async (req, res) => {
       await otpData.save();
       console.log('otp saved.............');
 
+      const{referralId}  =req.session;
+
+
+      ///////
+
+      if (referralId) {
+        const referralAmount = await referral.findOne();
+        const walletAmount = referralAmount.amount;
+
+        await user.findOneAndUpdate(
+          { _id: referralId },
+          { $inc: { wallet: walletAmount } }
+        );
+
+        const walletTransaction = new WalletTransaction({
+          user: referralId,
+          amount: walletAmount,
+          description: "Referral Bonus",
+          transactionType: "credit",
+        });
+        await walletTransaction.save();
+      }
+
+////////////////////
 
       try {
 
@@ -142,14 +172,40 @@ const verifyOTP = async (req, res) => {
           username: _name,
           email: _email,
           password: _password,
-
-
+          
         });
 
 
         req.session.username = _name;
         req.session.email = _email;
         req.session.userlogged = true;
+
+        let userid= user._id;
+        console.log("#########$%^&*",userid);
+
+        /////////////
+        if (referralId) {
+          const referralInfo = await user.findById(referralId);
+          const referredByUserId = referralInfo._id;
+  
+          await user.findOneAndUpdate(
+            { _id: userid },
+            { $set: { referredBy: referredByUserId } }
+          );
+  
+          await user.findOneAndUpdate(
+            { _id: referredByUserId },
+            { $addToSet: { referredUsers: userid } }
+          );
+        }
+  
+        const referralLink = `http://localhost:8080/signup?ref=${userid}`;
+        await user.findOneAndUpdate(
+          { _id: userid },
+          { $set: { referralLink: referralLink } }
+        );
+
+        ///////////////////
 
         res.redirect('/user/user-home');
       } catch (error) {
@@ -221,10 +277,10 @@ const otppage = (req, res) => {
 const shoppage = async (req, res) => {
   try {
     const proctData = await Product.find({ isDeleted: false ,Status: true }).exec()
-    console.log('........................................................:', proctData);
-    res.render('./user/shop', { proctData });
+    const categoryData = await Category.find({ isDeleted: false ,Status: true }).exec()
+
+    res.render('./user/shop', { proctData,categoryData });
   } catch (error) {
-    console.error('Error:', error, '..............................................');
     res.status(500).send('Internal Server Error');
   }
 }
@@ -391,7 +447,6 @@ const forgetPassOtpVerification=async(req,res)=>{
 
       otpData.isExpired = true;
       await otpData.save();
-      console.log('otp saved.............');
 
       req.session.email = email;
       req.session.userlogged = true;
@@ -492,7 +547,6 @@ const editaddress = async (req, res) => {
     existingAddress.pincode = pincode;
     console.log(existingAddress, '=========================');
     await userData.save();
-    console.log(userData, '.............................................');
     res.json({ success: true, message: 'edit address success' })
   } catch (error) {
     console.error("Error editing address:", error);
@@ -539,6 +593,111 @@ const deleteAddress = async (req, res) => {
 
 
 
+const catogerywiseproductpage = async (req, res) => {
+  try {
+    const categoryId = req.params.id; 
+    console.log(categoryId, 'lllllllllllllllmmmmmmmmmmmnnnnnnnnnnnnnppppppppppppooooooooooo');
+
+    const categories = await Category.find({ categoryId: categoryId, isDeleted: false});
+
+    
+    const products = await Product.find({ categoryId: categoryId,isDeleted: false,});
+    res.render('./user/catogerywiseproductpage', { products, categories });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
+
+
+
+
+const submitReturn = async (req, res) => {
+  try {
+    const { orderId, returnReason } = req.body;
+    const Email = req.session.email;
+    const User = await user.findOne({ email: Email });
+    const userId = User._id;
+
+    const order = await Order.findOne({ _id: orderId, UserId: userId });
+
+    order.ReturnRequest = {
+      reason: returnReason,
+      status: "Pending",
+      createdAt: new Date(),
+    };
+
+    await order.save();
+
+    const Return = await Order.findByIdAndUpdate(orderId, {
+      Status: "Return Pending",
+    });
+
+
+    res.json({
+      success: true,
+      message: "Return request submitted successfully",
+    });
+  } catch (error) {
+    console.error("error while submiting the return request:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+const ProductFilter = async (req, res) => {
+  try {
+    const categoryId = req.body.category;
+    const categoryData = await Category.findById(categoryId);
+
+    if (!categoryData) {
+      return res.status(404).send('Category not found');
+    }
+
+    let sortOption = {}; 
+    if (req.body.priceSort) {
+      sortOption = { price: req.body.priceSort === 'highToLow' ? -1 : 1 };
+    }
+
+    const proctData = await Product.find({
+       categoryId
+    }).sort(sortOption).exec();
+
+    const allCategories = await Category.find({ isDeleted: false, Status: true }).exec();
+
+    res.render('./user/filterpage', { proctData, categoryData, allCategories });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
+
+
+
+
+const sendResendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const otpInfo = await sendOTP(email);
+
+    await OTP.updateOne(
+      { email: email },
+      { $set: { otp: otpInfo.otp, isExpired: false } },
+      { upsert: true }
+    );
+
+    res.status(200).json({ message: 'OTP Resent successfully' });
+  } catch (error) {
+    console.error('Error during OTP resend:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 
 
 
@@ -546,7 +705,52 @@ const deleteAddress = async (req, res) => {
 
 
 
+const generateInvoices = async (req, res) => {
+  try {
+    const { orderId } = req.body;
 
+    const orderDetails = await Order.find({ _id: orderId })
+      .populate("Address")
+      .populate("Items.productId");
+
+    const ordersId = orderDetails[0]._id;
+    console.log(orderDetails,'@@@@2');
+    console.log('!!!',ordersId);
+
+    if (orderDetails) {
+      const invoicePath = await generateInvoice(orderDetails);
+
+      res.json({
+        success: true,
+        message: "Invoice generated successfully",
+        invoicePath,
+      });
+    } else {
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to generate the invoice" });
+    }
+  } catch (error) {
+    console.error("error in invoice downloading");
+    res
+      .status(500)
+      .json({ success: false, message: "Error in generating the invoice" });
+  }
+};
+
+//download invoice
+const downloadInvoice = async (req, res) => {
+  try {
+    const id = req.params.orderId;
+    const filePath = `D:\\specmen\\public\\pdf\\${id}.pdf`;
+    res.download(filePath, `invoice.pdf`);
+  } catch (error) {
+    console.error("Error in downloading the invoice:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error in downloading the invoice" });
+  }
+};
 
 
 
@@ -589,6 +793,13 @@ module.exports = {
 profile,
 forgotpassword,
 toforget,
-forgetPassOtpVerification
+forgetPassOtpVerification,
+catogerywiseproductpage,
+submitReturn,
+ProductFilter,
+sendResendOTP,
+generateInvoices,
+downloadInvoice
+
 
 };

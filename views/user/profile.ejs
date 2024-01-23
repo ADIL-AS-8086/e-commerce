@@ -54,7 +54,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex flex-column align-items-center text-center">
-                                
+
                                 <label for="profileImage">
                                     <img src='/productimages/<%=userData.profilePhoto%>' id="userprofileIMG" alt="Admin"
                                         class="rounded-circle p-1 bg-primary" width="110"
@@ -76,14 +76,27 @@
                             </div>
 
                             <ul style=" list-style-type: none;">
-                                <a href="/user/order-history"><li><button type="button" class="btn btn-custom"><i class="fas fa-list"></i>
-                                        Order</button></li></a>
+                                <a href="/user/order-history">
+                                    <li><button type="button" class="btn btn-custom"><i class="fas fa-list"></i>
+                                            Order</button></li>
+                                </a>
                                 <a href="/user/adress">
                                     <li><button type="button" class="btn btn-custom"><i
                                                 class="fas fa-map-marker-alt"></i> Address Management</button></li>
                                 </a>
                                 <li><button type="button" class="btn btn-custom"><i class="fas fa-shopping-cart"></i>
                                         Cart</button></li>
+                                <a href="/user/coupon-show">
+                                    <li><button type="button" class="btn btn-custom"><i class="fa-solid fa-sack-xmark"
+                                                style="color: #000000;"></i>
+                                            Coupons</button></li>
+                                </a>
+                                <a href="/user/wallet-get">
+                                    <li><button type="button" class="btn btn-custom"><i class="fa-solid fa-wallet"
+                                                style="color: #000000;"></i></i>
+                                            Wallet</button></li>
+                                </a>
+
                                 <li><button type="button" class="btn btn-custom"><i class="fas fa-lock"></i> Change
                                         Password</button></li>
                             </ul>
@@ -129,14 +142,29 @@
                                 </div>
                                 <div class="col-sm-9 text-secondary">
                                     <p>
-                                        <% if (userData.address && userData.address.length > 0 && userData.address[0].mobile) { %>
+                                        <% if (userData.address && userData.address.length> 0 &&
+                                            userData.address[0].mobile) { %>
                                             <%= userData.address[0].mobile %>
-                                        <% } else { %>
-                                            No phone number available
-                                        <% } %>
+                                                <% } else { %>
+                                                    No phone number available
+                                                    <% } %>
                                     </p>
                                     <hr>
-                                  
+
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <h6 class="mb-0">Referral Link</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary">
+                                    <p>
+                                        <span id="referralLink">http://localhost:3000/user/signup?ref=<%= userData._id
+                                                %></span>
+                                        <button class="btn btn-outline-secondary btn-sm"
+                                            onclick="copyReferralLink()">Copy</button>
+                                    </p>
+                                    <hr>
                                 </div>
                             </div>
 
@@ -162,6 +190,8 @@
                                                 <input type="text" class="form-control" id="newUserName"
                                                     name="newUserName">
                                             </div>
+                                            <div id="errorMessage" class="text-danger" style="display: none;"></div>
+
                                         </form>
                                     </div>
                                 </div>
@@ -202,7 +232,7 @@
                         var preview = document.getElementById('userprofileIMG');
 
                         preview.src = input.files[0];
-                        
+
                     }
 
                     function changeProfileImage() {
@@ -240,6 +270,8 @@
                                 alert('An unexpected error occurred.');
                             });
                     }
+
+
                 </script>
 
 
@@ -247,7 +279,18 @@
                 <!-- // <<------------------------------------------------------------------------------------------------------------------------------>
 
 
-
+                <script>
+                    function copyReferralLink() {
+                        var referralLink = document.getElementById('referralLink');
+                        var textArea = document.createElement("textarea");
+                        textArea.value = referralLink.textContent;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        alert('Referral link copied to clipboard!');
+                    }
+                </script>
 
 
 
@@ -255,7 +298,27 @@
 
                 <script>
                     function changeUserName() {
-                 
+
+
+
+                        var newUserNameInput = $('#newUserName');
+                        var errorMessage = $('#errorMessage');
+
+                        errorMessage.hide();
+
+                        var newUserNameValue = newUserNameInput.val().trim();
+
+                        if (newUserNameValue === "") {
+                            displayErrorMessage("New username cannot be empty.");
+                            return;
+                        }
+
+
+
+
+
+
+
                         var formData = $('#changeUsernameForm').serializeArray();
                         var jsonData = {};
                         console.log(formData);
@@ -285,6 +348,17 @@
                                 console.error('Error during the Fetch request:', error);
                             });
                     }
+
+                    
+    function displayErrorMessage(message) {
+        var errorMessage = $('#errorMessage');
+        errorMessage.text(message);
+        errorMessage.show();
+        setTimeout(function () {
+            errorMessage.hide();
+        }, 2000);
+
+    }
                 </script>
 
 

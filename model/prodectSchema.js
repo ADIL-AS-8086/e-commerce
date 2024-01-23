@@ -7,6 +7,7 @@ const { Schema, ObjectId } = mongoose;
 const ProductsSchema = new Schema({
   name: { type: String },
   price: { type: Number, min: 0 },
+  Discountedprice: { type: Number, min: 0 },
   description: { type: String },
   highlight1: { type: String },
   highlight2: { type: String },
@@ -29,6 +30,7 @@ const ProductsSchema = new Schema({
     endDate: { type: Date },
     additionalDetails: { type: String },
   },
+
   timeStamp: { type: Date },
   images: { type: Array },
   colour: { type: String },

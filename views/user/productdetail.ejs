@@ -142,37 +142,55 @@
       <!-- Product info container -->
       <div class="product-info mt-5">
         <h5 style="font-weight: bold;"><%= productData.name%></h5>
-        <p style="font-weight: bolder;">Rs.<%= productData.price %> </p>
+        <% if (productData.offer && productData.offer.discountPercentage > 0) { %>
+            <!-- Display offer price, offer percentage, and original price in one line for products with offers -->
+            <div class="offer-container">
+                <p class="custom-p" style="font-weight: bolder; background-color: yellow; color: black; display: inline-block;">
+                    ₹ <%= productData.Discountedprice %>
+                </p>
+                <p class="custom-p" style="font-weight: bolder; background-color: yellow; color: black; display: inline-block;">
+                    <%= productData.offer.discountPercentage %>% Off
+                </p>
+                <!-- Display original price with strike-through -->
+                <p class="original-price"
+                    style="text-decoration: line-through; color: black; display: inline-block; margin-left: 5px;">
+                    ₹ <%= productData.price %>
+                </p>
+            </div>
+        <% } else { %>
+            <!-- Display regular price if no offer is available -->
+            <p style="font-weight: bolder;">Rs.<%= productData.price %> </p>
+        <% } %>
         <p class="product-description">•<%= productData.highlight1 %></p>
         <p class="product-description">•<%= productData.highlight2 %></p>
         <p class="product-description">•<%= productData.highlight3 %></p>
         <p class="product-description">•<%= productData.highlight4 %></p>
-
+    
         <p class="color-label" style="font-weight: bold;">Colour:<%= productData.colour %> </p>
-
+    
         <p class="color-label">Size:
-          <% productData.variant.forEach(variant => { %>
-            <button type="button" class="btn  size-button" data-size="<%= variant.size%>"
-              data-quantity="<%= variant.quantity %>" data-id="<%=variant._id %>"
-              style="height: 40px; width: 40px; border: 1px solid #000; margin-right: 5px; margin-left: 5px;"
-              <%= variant.quantity < 1 ? 'disabled' : '' %>>
-              <%= variant.size %>
+            <% productData.variant.forEach(variant => { %>
+                <button type="button" class="btn  size-button" data-size="<%= variant.size%>"
+                    data-quantity="<%= variant.quantity %>" data-id="<%=variant._id %>"
+                    style="height: 40px; width: 40px; border: 1px solid #000; margin-right: 5px; margin-left: 5px;"
+                    <%= variant.quantity < 1 ? 'disabled' : '' %>>
+                    <%= variant.size %>
+                </button>
+            <% }); %>
+            <button type="button" class="btn btn-light ms-5"
+                style="height: 40px; width: 40px; border: 1px solid #000; position: relative; margin-left: 0;">
+                <span
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">
+                    <i class="fa-regular fa-heart" style="color: #000000;"></i>
+                </span>
             </button>
-          <% }); %>
-          <button type="button" class="btn btn-light ms-5"
-            style="height: 40px; width: 40px; border: 1px solid #000; position: relative; margin-left: 0;">
-            <span
-              style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">
-              <i class="fa-regular fa-heart" style="color: #000000;"></i>
-            </span>
-          </button>
         </p>
-
+    
         <button type="button" class="add-to-cart-btn mt-3" id="addToCart"
-          style="border: 1px solid #000; background-color: 8bb17f; height: 50px; width: 100%;">
-          <span><i class="fa-solid fa-cart-plus" style="color: #000000;"></i></span> Add to Cart
+            style="border: 1px solid #000; background-color: 8bb17f; height: 50px; width: 100%;">
+            <span><i class="fa-solid fa-cart-plus" style="color: #000000;"></i></span> Add to Cart
         </button>
-      </div>  
+    </div>
     </div>
 <hr style="margin-top: 70px;">
 

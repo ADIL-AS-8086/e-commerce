@@ -7,9 +7,25 @@ const editmulter = require('../middleware/edilMulter');
 const productController = require('../controller/productController');
 const uploadproduct = require('../middleware/productmulter');
 const orderController=require('../controller/ordercontroller')
+const couponController=require('../controller/couponController')
 const adminAuth=require('../middleware/adminAuth')
+const referralController=require('../controller/refferalController')
+
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 // <<--------------------------------------------------------------------------------------------------------------------------->>
+
+
+
+admin.get('/dashboard',adminAuth.verifyAdmin, adminController.isAdmin)
+admin.get('/count-orders-by-day',adminAuth.verifyAdmin, adminController.getCount)
+admin.get('/count-orders-by-month',adminAuth.verifyAdmin, adminController.getCount)
+admin.get('/count-orders-by-year',adminAuth.verifyAdmin, adminController.getCount)
+admin.get('/latestOrders',adminAuth.verifyAdmin, adminController.getOrdersAndSellers)
+
+
+
+
+
 
 
 
@@ -95,8 +111,13 @@ admin.post('/delete-product/:id', productController.softDeleteProduct);
 
 
 admin.get('/offer-list',productController.offerpage)
-admin.post('/add-offer/:id', productController.addoffer);
+admin.post('/add-offer/:id', productController.addoffer)
+
+admin.post('/delete-offer/:id', productController.deleteoffer);
 // <<--------------------------------------------------------------------------------------------------------------------------->>
+
+
+
 
 
 // orderadmin
@@ -104,6 +125,29 @@ admin.post('/add-offer/:id', productController.addoffer);
 admin.get('/order-list', orderController.OrderList);
 
 admin.post('/updateOrderStatus',orderController.updateOrderStatus);
+
+
+admin.put('/orders/acceptReturn/:orderId',orderController.acceptReturn)
+admin.put('/orders/cancelReturn/:orderId',orderController.cancelReturn)
+
+
+
+//coupons
+
+admin.get('/coupon-page',couponController.couponPage)
+admin.post('/add-coupon', couponController.addCoupon);
+admin.post('/delete-coupon/:id',couponController.deletecoupon)
+
+
+
+//refferal 
+
+admin.get('/refferal',referralController.refferalWallet)
+admin.post('/updateReferralAmount', referralController.updateReferralAmount)
+
+admin.post('/download-sales-report', orderController.genereatesalesReport)
+
+
 
 
 module.exports = admin

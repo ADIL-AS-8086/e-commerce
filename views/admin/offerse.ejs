@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="card"
-                style="width: 1000px; height: 500px; background-color: #ffffff;  margin-top: 50px; margin-left: 150px;">
+                style="width: 800px;   background-color: #ffffff;  margin-top: 50px; margin-left: 150px;   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h5 class="card-title">Product Offer</h5>
                     <table class="table table-bordered table-striped">
@@ -16,6 +16,7 @@
                                 <th scope="col">Start Date</th>
                                 <th scope="col">End Date</th>
                                 <th scope="col">Actions</th>
+                                <th scope="col">Delete</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -24,8 +25,9 @@
                                     <tr>
                                         <td><%= index + 1 %></td>
                                         <td>
-                                            <%= product.name %>
+                                  
                                             <img src="/productimages/<%= product.images[0].filename %>" alt="Product Image" class="img-fluid" style="max-width: 50px; max-height: 60px; margin-right: 10px;">
+                                                      <%= product.name %>
                                         </td>
                                         
                                         <td><%= product.offer ? (product.offer.discountPercentage + '%') : 'No Offer' %></td>
@@ -48,16 +50,25 @@
                                                             <form id="addOfferForm<%= index %>">
                                                                 <div class="mb-3">
                                                                     <label for="discountPercentage<%= index %>" class="form-label">Discount Percentage</label>
-                                                                    <input type="number" class="form-control" id="discountPercentage<%= index %>" name="discountPercentage" placeholder="Enter discount percentage" min="1" max="99" required>
+                                                                    <input type="number" class="form-control" id="discountPercentage<%= index %>" name="discountPercentage" placeholder="Enter discount percentage" min="1" max="90" required>
+                                                                    <div id="discountPercentageError<%= index %>" class="invalid-feedback">
+                                                                        Discount percentage must be between 1 and 90.
+                                                                    </div>
                                                                 </div>
+                                                                
                                                                 <div class="mb-3">
                                                                     <label for="startDate<%= index %>" class="form-label">Start Date</label>
                                                                     <input type="date" class="form-control" id="startDate<%= index %>" name="startDate" required>
                                                                 </div>
+                                                                
                                                                 <div class="mb-3">
                                                                     <label for="endDate<%= index %>" class="form-label">End Date</label>
                                                                     <input type="date" class="form-control" id="endDate<%= index %>" name="endDate" required>
+                                                                    <div id="dateError<%= index %>" class="invalid-feedback">
+                                                                        End date must be greater than start date.
+                                                                    </div>
                                                                 </div>
+                                                                
                                                                 <button type="submit" id="addOfferBtn<%= index %>" class="btn btn-primary" data-product-id="<%= product._id %>">Add Offer</button>
                                                             </form>                                                            
                                                             
@@ -67,6 +78,13 @@
                                             </div>
 
 
+                                        </td>
+                                        <td>
+                                            <form id="deleteOfferForm<%= index %>" action="/admin/delete-offer/<%= product._id %>" method="post">
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fas fa-trash-alt" style="color: white;"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <% }); %>
@@ -89,23 +107,31 @@
         <% productData.forEach((product, index) => { %>
             document.getElementById('addOfferForm<%= index %>').addEventListener('submit', function (event) {
                 var percentageField = document.getElementById('discountPercentage<%= index %>');
-                var percentageError = document.getElementById('discountPercentageError<%= index %>'); 
+                var startDateField = document.getElementById('startDate<%= index %>');
+                var endDateField = document.getElementById('endDate<%= index %>');
+                var percentageError = document.getElementById('discountPercentageError<%= index %>');
+                var dateError = document.getElementById('dateError<%= index %>');
 
-                if (percentageField.value < 1 || percentageField.value > 99) {
-                    event.preventDefault(); 
-                    percentageField.classList.add('is-invalid');
-                    percentageError.style.display = 'block';
+                
+                // Validate start and end dates
+                var startDate = new Date(startDateField.value);
+                var endDate = new Date(endDateField.value);
+
+                if (startDate >= endDate) {
+                    event.preventDefault();
+                    startDateField.classList.add('is-invalid');
+                    endDateField.classList.add('is-invalid');
+                    dateError.style.display = 'block';
                 } else {
-                    percentageField.classList.remove('is-invalid');
-                    percentageError.style.display = 'none';
+                    startDateField.classList.remove('is-invalid');
+                    endDateField.classList.remove('is-invalid');
+                    dateError.style.display = 'none';
                 }
             });
 
             $(document).ready(function () {
                 $('#addOfferBtn<%= index %>').click(function () {
                     const id = $(this).data('product-id');
-                    console.log(id, '@@@@@@@@@');
-
                     const formData = $('#addOfferForm<%= index %>').serialize();
 
                     $.ajax({
@@ -127,7 +153,22 @@
             });
         <% }); %>
     <% } %>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        <% if (productData && productData.length > 0) { %>
+            <% productData.forEach((product, index) => { %>
+                document.getElementById('deleteOfferForm<%= index %>').addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    const confirmation = confirm('Are you sure you want to delete this offer?');
+                    if (confirmation) {
+                        this.submit();
+                    }
+                });
+            <% }); %>
+        <% } %>
+    });
 </script>
+
 
 <%- include('../partials/adminFooter') %>
 
