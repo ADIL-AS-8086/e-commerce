@@ -48,10 +48,10 @@ admin.post('/unblock/:userId',adminAuth.verifyAdmin,adminController.unBlockUser)
 
 admin.get('/catogeryList',adminAuth.verifyAdmin, catogeryController.categoryListPage);
 admin.get('/addCategory',adminAuth.verifyAdmin, catogeryController.addCategorypage);
-admin.post('/toaddCatogery',upload.single('image'), catogeryController.addCategory);
+admin.post('/toaddCatogery',upload.single('image'),adminAuth.verifyAdmin, catogeryController.addCategory);
 
 admin.get('/editcategory/:id',adminAuth.verifyAdmin, catogeryController.editCategory);
-admin.post('/editcategory/:id', editmulter.single('image'), catogeryController.afterEditCategory);
+admin.post('/editcategory/:id', editmulter.single('image'),adminAuth.verifyAdmin, catogeryController.afterEditCategory);
 
 admin.post('/blockCategory/:id', adminAuth.verifyAdmin, catogeryController.blockcatogery);
 
@@ -76,8 +76,8 @@ admin.post('/deleteCategory/:id',adminAuth.verifyAdmin, catogeryController.delet
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 // products managment
-admin.get('/products', productController.productsPage);
-admin.get('/addproduct', productController.addproduct);
+admin.get('/products' ,adminAuth.verifyAdmin, productController.productsPage);
+admin.get('/addproduct' ,adminAuth.verifyAdmin, productController.addproduct);
 
 admin.post('/addproduct', uploadproduct.fields([
   { name: 'productImages', maxCount: 1 },
@@ -85,12 +85,12 @@ admin.post('/addproduct', uploadproduct.fields([
   { name: 'image2', maxCount: 1 },
   { name: 'image3', maxCount: 1 },
   { name: 'image4', maxCount: 1 },
-]), productController.toaddProduct);
+]),adminAuth.verifyAdmin, productController.toaddProduct);
 
 
 
 //editproduct
-admin.get('/editProduct/:id', productController.editproduct);
+admin.get('/editProduct/:id' ,adminAuth.verifyAdmin, productController.editproduct);
 
 // admin.post('/editproduct/:id', uploadproduct.fields([
 //   { name: 'productImages', maxCount: 1 },
@@ -100,20 +100,20 @@ admin.get('/editProduct/:id', productController.editproduct);
 //   { name: 'image4', maxCount: 1 },
 // ]), productController.updateProduct);
 
-admin.post('/editproduct/:id',uploadproduct.any(),productController.updateProduct)
+admin.post('/editproduct/:id',adminAuth.verifyAdmin,uploadproduct.any(),productController.updateProduct)
 
 
 
-admin.get('/blockproduct/:id', productController.blockproducts);
+admin.get('/blockproduct/:id',adminAuth.verifyAdmin, productController.blockproducts);
 
-admin.post('/delete-product/:id', productController.softDeleteProduct);
+admin.post('/delete-product/:id' ,adminAuth.verifyAdmin, productController.softDeleteProduct);
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 
 
-admin.get('/offer-list',productController.offerpage)
-admin.post('/add-offer/:id', productController.addoffer)
+admin.get('/offer-list',adminAuth.verifyAdmin,productController.offerpage)
+admin.post('/add-offer/:id',adminAuth.verifyAdmin, productController.addoffer)
 
-admin.post('/delete-offer/:id', productController.deleteoffer);
+admin.post('/delete-offer/:id',adminAuth.verifyAdmin, productController.deleteoffer);
 // <<--------------------------------------------------------------------------------------------------------------------------->>
 
 
@@ -122,32 +122,31 @@ admin.post('/delete-offer/:id', productController.deleteoffer);
 
 // orderadmin
 
-admin.get('/order-list', orderController.OrderList);
+admin.get('/order-list',adminAuth.verifyAdmin, orderController.OrderList);
 
-admin.post('/updateOrderStatus',orderController.updateOrderStatus);
+admin.post('/updateOrderStatus',adminAuth.verifyAdmin,orderController.updateOrderStatus);
 
 
-admin.put('/orders/acceptReturn/:orderId',orderController.acceptReturn)
-admin.put('/orders/cancelReturn/:orderId',orderController.cancelReturn)
+admin.put('/orders/acceptReturn/:orderId',adminAuth.verifyAdmin,orderController.acceptReturn)
+admin.put('/orders/cancelReturn/:orderId',adminAuth.verifyAdmin,orderController.cancelReturn)
 
 
 
 //coupons
 
-admin.get('/coupon-page',couponController.couponPage)
-admin.post('/add-coupon', couponController.addCoupon);
-admin.post('/delete-coupon/:id',couponController.deletecoupon)
+admin.get('/coupon-page',adminAuth.verifyAdmin,couponController.couponPage)
+admin.post('/add-coupon',adminAuth.verifyAdmin, couponController.addCoupon);
+admin.post('/delete-coupon/:id',adminAuth.verifyAdmin,couponController.deletecoupon)
 
 
 
 //refferal 
 
-admin.get('/refferal',referralController.refferalWallet)
-admin.post('/updateReferralAmount', referralController.updateReferralAmount)
+admin.get('/refferal',adminAuth.verifyAdmin,referralController.refferalWallet)
+admin.post('/updateReferralAmount',adminAuth.verifyAdmin, referralController.updateReferralAmount)
 
-admin.post('/download-sales-report', orderController.genereatesalesReport)
-
-
+admin.post('/download-sales-report',adminAuth.verifyAdmin, orderController.genereatesalesReport)
 
 
-module.exports = admin
+
+module.exports = admin;

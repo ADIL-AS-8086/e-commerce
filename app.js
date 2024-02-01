@@ -17,6 +17,7 @@ connectDB=require('./config/connectionDB')
 // const FileType = require('file-type');
 const { validationResult } = require('express-validator');
 const bodyParser = require('body-parser');
+const sharp = require('sharp');
 
 
 

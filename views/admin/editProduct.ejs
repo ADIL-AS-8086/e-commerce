@@ -161,22 +161,48 @@
       <div class="card bg-white">
         <div class="card-header">
           <h2>Product Images</h2>
-          <% for (let i=0; i < 5; i++) { %>
-            <div class="col-md-6">
-              <label for="productImage<%= i + 1 %>" class="form-label">Image <%= i + 1 %></label>
-              <input type="file" class="form-control" name="image<%=i%>" accept="image/*" id="productImage<%= i + 1 %>">
-
-              <% if (productData.images[i]) { %>
-                <img src="/productimages/<%= productData.images[i].filename %>" alt="Product Image"
-                  class="preview-image" style="height: 100px; width: 100px;">
-                <% } %>
-            </div>
+          <% for (let i = 0; i < 5; i++) { %>
+          <div class="col-md-6">
+            <label for="productImage<%= i + 1 %>" class="form-label">Image <%= i + 1 %></label>
+            <input type="file" class="form-control" name="image<%= i %>" accept="image/*" id="productImage<%= i + 1 %>">
+    
+            <% if (productData.images[i]) { %>
+            <img src="/productimages/<%= productData.images[i].filename %>" alt="Product Image" class="preview-image"
+              style="height: 100px; width: 100px;">
+            <button class="delete-image" data-index="<%= i %>">Delete</button>
             <% } %>
+          </div>
+          <% } %>
         </div>
       </div>
     </div>
+    
 
   </form>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const deleteButtons = document.querySelectorAll('.delete-image');
+  
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', function () {
+          // Get the index of the image to delete
+          const indexToDelete = this.dataset.index;
+  
+          // Get the parent container of the image and button
+          const imageContainer = this.parentNode;
+  
+          // Remove the image element and the delete button
+          imageContainer.querySelector('img').remove();
+          this.remove();
+  
+          // If you need to do something with the index on the client side, you can use it here
+          console.log('Deleted image at index:', indexToDelete);
+        });
+      });
+    });
+  </script>
 
   <script>
     function updateImagePreview(inputId, previewId) {

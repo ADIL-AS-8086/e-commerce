@@ -79,11 +79,108 @@
                                         <% if (order.Status !=='cancelled' ) { %>
                                             <% if (order.Status !=='rejected' ) { %>
                                                 <% if (order.Status !=='delivered' ) { %>
+                                                    <% if(order.Status !=='Return Pending'){%>
+                                                        <% if(order.Status !=='Return Rejected'){%>
+                                                            <% if(order.Status !=='Return Accepted'){%>
                                                     <button type="button" class="btns cancel-order-btn"
                                                         data-order-id="<%= order._id %>">
                                                         <span><i class="fa-solid fa-ban fa-beat"
                                                                 style="color: #000000;"></i></span>CANCEL ORDER
                                                     </button>
+                                                    
+                                                    <%}else{%>
+                                                        <button type="button" class="btns" style="background-color: #ffffff; color: #ff0000; font-weight: bold;"
+                                                        data-bs-toggle="modal" data-bs-target="#returnupdates<%= order._id %>">
+                                                        <span><i class="fa-solid fa-ban fa-beat"
+                                                                style="color: #b01d1d;"></i></span> ORDER RETURNED CLICK FOR UPDATES
+                                                    </button>
+
+
+                                                    <div class="modal fade" id="returnupdates<%= order._id %>"  data-bs-keyboard="false" tabindex="-1" aria-labelledby="returnOrderModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog ">
+                                                          <div class="modal-content">
+                                                            <div class="modal-header">
+                                                              <h5 class="modal-title" id="returnupdates">Return Order Status</h5>
+                                                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <% if(order.Status=='Return Pending'){%>
+                                                                <h6>
+                                                              <span style="margin-left: 50px; font-weight: bolder;"><i class="fa-solid fa-right-left" style="color: #000000;"></i>RETURN STATUS</span>: <span></span><span style="margin-left: 20px; color: #ff0000;" ><%=order.Status%> </span></h6>
+                                                              <%}else{%>
+                                                              <h6>
+                                                                <span style="margin-left: 50px; font-weight: bolder;"><i class="fa-solid fa-right-left" style="color: #000000;"></i>RETURN STATUS</span>: <span></span><%=order.Status%> <span style="margin-left: 20px;"></span></h6>
+
+                                                                <h6 style="margin-top: 20px; margin-left: 20px;">Amount  credited to your vallet</h6>
+                                                                <%}%>
+                                                            <div class="modal-footer">
+                                                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    <%}%>
+                                                    <%}else{%>
+                                                        <button type="button" class="btns" style="background-color: #ffffff; color: #ff0000; font-weight: bold;"
+                                                        data-bs-toggle="modal" data-bs-target="#returnupdates<%= order._id %>">
+                                                        <span><i class="fa-solid fa-ban fa-beat"
+                                                                style="color: #b01d1d;"></i></span> ORDER RETURNED CLICK FOR UPDATES
+                                                    </button>
+
+
+                                                    <div class="modal fade" id="returnupdates<%= order._id %>"  data-bs-keyboard="false" tabindex="-1" aria-labelledby="returnOrderModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog ">
+                                                          <div class="modal-content">
+                                                            <div class="modal-header">
+                                                              <h5 class="modal-title" id="returnupdates">Return Order Status</h5>
+                                                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <% if(order.Status=='Return Pending'){%>
+                                                                <h6>
+                                                              <span style="margin-left: 50px; font-weight: bolder;"><i class="fa-solid fa-right-left" style="color: #000000;"></i>RETURN STATUS</span>: <span></span><span style="margin-left: 20px; color: #ff0000;" ><%=order.Status%> </span></h6>
+                                                              <%}else{%>
+                                                              <h6>
+                                                                <span style="margin-left: 50px; font-weight: bolder;"><i class="fa-solid fa-right-left" style="color: #000000;"></i>RETURN STATUS</span>: <span></span><%=order.Status%> <span style="margin-left: 20px;"></span></h6>
+
+                                                                <h6 style="margin-top: 20px; margin-left: 20px;">Amount  credited to your vallet</h6>
+                                                                <%}%>
+                                                            <div class="modal-footer">
+                                                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    <%}%>
+                                                    <%}else{%>
+                                                        <button type="button" class="btns" style="background-color: #ffffff; color: #ff0000; font-weight: bold;"
+                                                        data-bs-toggle="modal" data-bs-target="#returnupdates<%= order._id %>">
+                                                        <span><i class="fa-solid fa-ban fa-beat"
+                                                                style="color: #b01d1d;"></i></span> ORDER RETURNED CLICK FOR UPDATES
+                                                    </button>
+
+
+                                                    <div class="modal fade" id="returnupdates<%= order._id %>"  data-bs-keyboard="false" tabindex="-1" aria-labelledby="returnOrderModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog ">
+                                                          <div class="modal-content">
+                                                            <div class="modal-header">
+                                                              <h5 class="modal-title" id="returnupdates">Return Order Status</h5>
+                                                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                           
+                                                                <h6>
+                                                           
+                                                         
+                                                              <h6>
+                                                                <span style="margin-left: 50px; font-weight: bolder;"><i class="fa-solid fa-right-left" style="color: #000000;"></i>RETURN STATUS</span>: <span></span><%=order.Status%> <span style="margin-left: 20px;"></span></h6>
+
+                                                                <h6 style="margin-top: 20px; margin-left: 20px;">Amount  credited to your vallet</h6>
+                                                               
+                                                            <div class="modal-footer">
+                                                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    <%}%>
                                                     <% } else { %>
                                                         <button type="button" class="btns return-order-btn" data-bs-toggle="modal" data-bs-target="#returnOrderModal<%= order._id %>">
 
@@ -109,6 +206,7 @@
                                       <label for="returnReason">Reason for Return:</label>
                                       <textarea id="returnReason<%= order._id %>" class="form-control" rows="3"></textarea>
                                     </div>
+
                                     <div class="modal-footer">
                                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                       <button type="button" class="btn btn-primary" onclick="submitReturn('<%= order._id %>')">Submit Return</button>
@@ -116,7 +214,7 @@
                                   </div>
                                 </div>
                               </div>
-
+                                                     
 
                                                         <% } %>
                                                             <% } %>
@@ -125,7 +223,8 @@
                                     </div>
                                     <% }); %>
                                         <% } else { %>
-                                            <!-- If order.Items is not available or not an array, display a message -->
+
+                    
                                             <p>No items available for this order.</p>
                                             <% } %>
 
@@ -240,14 +339,27 @@
                                                                                 <i
                                                                                     class="fa fa-check text-white"></i></span>
 
-                                                                            <% } %>
+                                                                            <% } else if (order.Status==='Return Pending' ) { %>
+                                                                                <span class="dot"></span>
+                                                                                <hr class="flex-fill track-line"><span
+                                                                                    class="dot"></span>
+                                                                                <hr class="flex-fill track-line"><span
+                                                                                    class="dot"></span>
+                                                                                <hr class="flex-fill track-line"><span
+                                                                                    class="dot"></span>
+                                                                                <hr class="flex-fill track-line">
+                                                                                <span
+                                                                                    class="d-flex justify-content-center align-items-center big-dot dot">
+                                                                                    <i
+                                                                                        class="fa fa-check text-white"></i></span>
+                                                                                        <%}%>
 
                                                 </div>
 
 
                                                 <div class="d-flex flex-row justify-content-between align-items-center">
                                                     <% if (order.Status !=='cancelled' ) { %>
-                                                        <% if (order.Status !=='rejected' ) { %>
+                                                        <% if (order.Status !=='rejected'  ) { %>
                                                             
                                                             <div class="d-flex flex-column align-items-start">
                                                                 <span>
@@ -431,6 +543,7 @@ console.log(returnReason);
 
 
   async function generateAndDownloadInvoice(orderId) {
+    console.log(orderId,'checking order id ');
     let timerInterval
 Swal.fire({
   title: 'Download Started!',
@@ -454,16 +567,21 @@ Swal.fire({
 })
 
       try {
-          const response = await fetch('/downloadinvoice', {
+          const response = await fetch('/user/downloadinvoice', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json', 
               },
+
               body: JSON.stringify({ orderId }) 
+              
           });
+          console.log(orderId,'checking order id ');
+
           if (response.ok) {
+            console.log("aaaaaaaaaaaaaaaa");
             
-              window.location.href = `/downloadinvoice/${orderId}`;
+              window.location.href = `/user/downloadinvoice/${orderId}`;
           }
       } catch (error) {
           console.error('Error in downloading the invoice:', error);

@@ -8,6 +8,11 @@ const User = require('../model/userSchema');
 const referral= require('../model/refferalSchema')
 const WalletTransaction=require('../model/WalletSchema')
 const Order= require('../model/ordersShema')
+const {generateInvoice} = require('../util/invoiceCreator');
+
+
+const fs = require("fs");
+const path = require("path");
 let _email;
 let _password;
 let _name;
@@ -278,8 +283,14 @@ const shoppage = async (req, res) => {
   try {
     const proctData = await Product.find({ isDeleted: false ,Status: true }).exec()
     const categoryData = await Category.find({ isDeleted: false ,Status: true }).exec()
-
-    res.render('./user/shop', { proctData,categoryData });
+    const page = parseInt(req.query.page) || 1;
+    const productsCount = await Product.find().count();
+    const pageSize = 5;
+    const totalProducts = Math.ceil(productsCount / pageSize);
+    const skip = (page - 1) * pageSize;
+    
+    res.render('./user/shop', { proctData,categoryData,productsCount: totalProducts,
+      page: page, });
   } catch (error) {
     res.status(500).send('Internal Server Error');
   }
@@ -650,12 +661,15 @@ const submitReturn = async (req, res) => {
 const ProductFilter = async (req, res) => {
   try {
     const categoryId = req.body.category;
+
+    console.log(categoryId,'afsallll');
     const categoryData = await Category.findById(categoryId);
 
     if (!categoryData) {
       return res.status(404).send('Category not found');
     }
-
+    const categoryname=categoryData.categoryname;
+    console.log(categoryname,'aaaaaaaaaffffffffffffffffffaaaaaaaasssssssssssall');
     let sortOption = {}; 
     if (req.body.priceSort) {
       sortOption = { price: req.body.priceSort === 'highToLow' ? -1 : 1 };
@@ -708,18 +722,25 @@ const sendResendOTP = async (req, res) => {
 const generateInvoices = async (req, res) => {
   try {
     const { orderId } = req.body;
+console.log('cheking the error ',orderId);
+    
+console.log('veruthe onn nokkunne varane so please help me ');
 
     const orderDetails = await Order.find({ _id: orderId })
       .populate("Address")
       .populate("Items.productId");
 
+console.log(orderDetails,'finding the order for create invoice so please help me');
     const ordersId = orderDetails[0]._id;
     console.log(orderDetails,'@@@@2');
-    console.log('!!!',ordersId);
+    console.log('!!!',ordersId,'i am checking that');
 
     if (orderDetails) {
+      console.log('note getiing ');
+      console.log(orderDetails);
       const invoicePath = await generateInvoice(orderDetails);
-
+      console.log(invoicePath,'not getting ');
+     console.log();
       res.json({
         success: true,
         message: "Invoice generated successfully",
@@ -731,18 +752,21 @@ const generateInvoices = async (req, res) => {
         .json({ success: false, message: "Failed to generate the invoice" });
     }
   } catch (error) {
-    console.error("error in invoice downloading");
+    console.error("error in invoice downloading:",error);
     res
       .status(500)
       .json({ success: false, message: "Error in generating the invoice" });
   }
 };
 
-//download invoice
 const downloadInvoice = async (req, res) => {
+  console.log('checking invoice to download');
   try {
     const id = req.params.orderId;
     const filePath = `D:\\specmen\\public\\pdf\\${id}.pdf`;
+
+    console.log('checking invoice to download iniside the try bloack so please ' );
+
     res.download(filePath, `invoice.pdf`);
   } catch (error) {
     console.error("Error in downloading the invoice:", error);
@@ -755,6 +779,20 @@ const downloadInvoice = async (req, res) => {
 
 
 
+
+const searchproduct = async (req, res) => {
+  try {
+    const searchTerm = req.body.query;
+    console.log('searchTerm', searchTerm);
+
+    const proctData = await Product.find({ name: { $regex: new RegExp(searchTerm, 'i') } });
+
+    res.render('./user/searchResults', { proctData, searchTerm });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
 
 
 
@@ -799,7 +837,7 @@ submitReturn,
 ProductFilter,
 sendResendOTP,
 generateInvoices,
-downloadInvoice
-
+downloadInvoice,
+searchproduct
 
 };

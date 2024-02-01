@@ -1,7 +1,7 @@
 const OTP = require("../model/otpSchema");
 const { generateOTP } = require("./generateOTP");
 const sendMail = require("../Auth/nodeMail");
-
+// console.log('@@@@@@############');
 async function sendOTP(email) {
   console.log(email,"this user email..");
   const otp =await generateOTP();

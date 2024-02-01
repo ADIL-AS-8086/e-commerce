@@ -561,7 +561,7 @@ const successOrder = async (req, res) => {
 
 const OrderList = async (req, res) => {
     try {
-        const Orderdata = await order.find().populate('Items.productId UserId').sort({ OrderDate: 'desc' });;
+        const Orderdata = await order.find().populate('Items.productId UserId ReturnRequest').sort({ OrderDate: 'desc' });;
 
         res.render('./admin/orderList', { Orderdata });
     } catch (error) {
@@ -695,7 +695,6 @@ const Cancelorderstatus = async (req, res) => {
             }
         }
 
-// console.log('shahid cancelled the order in case of changiing of his mind so please helphim');
 
 
         if (existingOrder.PaymentMethod === "Online" || existingOrder.PaymentMethod === "Wallet") {
@@ -740,7 +739,33 @@ const acceptReturn=async(req,res)=>{
     try {
       const orderId = req.params.orderId; 
   
-      const updatedOrder = await Order.findByIdAndUpdate(
+
+      const existingOrder = await order.findById(orderId).populate('Items.productId');
+
+      if (!existingOrder) {
+          return res.json({ success: false, error: 'Order not found' });
+      }
+
+
+      for (const item of existingOrder.Items) {
+          const productId = item.productId;
+          const size = item.size;
+          const quantity = item.quantity;
+
+          const products = await product.findById(productId);
+
+          if (products) {
+              const variant = products.variant.find(v => v.size === size);
+
+              if (variant) {
+                  variant.quantity += quantity;
+                  await products.save();
+              }
+          }
+      }
+      
+
+      const updatedOrder = await order.findByIdAndUpdate(
         orderId,
         { $set: { Status: 'Return Accepted' } },
         { new: true }
@@ -750,14 +775,14 @@ const acceptReturn=async(req,res)=>{
   
       await User.findByIdAndUpdate(userId, { $inc: { wallet: refundAmount } });
   
-      const walletTransaction = new WalletTransaction({
+      const walletTransactions = new walletTransaction({
         user: userId,
         amount: refundAmount,
         description: 'Product returned',
         transactionType: 'credit',
       });
       
-      await walletTransaction.save();
+      await walletTransactions.save();
   
       res.json({ success: true, order: updatedOrder });
   
@@ -773,9 +798,9 @@ const acceptReturn=async(req,res)=>{
     try {
       const orderId = req.params.orderId;
   
-      const updatedOrder = await Order.findByIdAndUpdate(
+      const updatedOrder = await order.findByIdAndUpdate(
         orderId,
-        { $set: { Status: 'Return Canceled' } },
+        { $set: { Status: 'Return Rejected ' } },
         { new: true }
       );
       res.json({ success: true, order: updatedOrder });
@@ -786,6 +811,7 @@ const acceptReturn=async(req,res)=>{
     }
   }
   
+
 
 
 

@@ -2,6 +2,8 @@ const products = require('../model/prodectSchema');
 const Category = require('../model/categorySchema');
 require('dotenv').config()
 
+const path=require('path')
+const sharp = require('sharp');
 
 
 
@@ -62,6 +64,28 @@ const toaddProduct = async (req, res) => {
         images.push({  filename: req.files[field][0].filename });
       }
     }
+
+
+    // for (const field of imageFields) {
+    //   if (req.files[field]) {
+    //     console.log('.................');
+    //     const imagePath = path.join(__dirname, '../public/productimages/', req.files[field][0].filename);
+    //     console.log(imagePath,'image path');
+    //     const outputImagePath = path.join(__dirname, '../public/productimages/cropped/', req.files[field][0].filename);
+    //     console.log(imagePath,outputImagePath,'this are the paths');
+    //     try {
+    //       await sharp(imagePath)
+    //         .resize(320, 240)
+    //         .toFile(outputImagePath);
+    //       console.log('image cropped');
+    //       images.push({ filename: outputImagePath });
+    //       console.log('image cropp worked......');
+    //     } catch (error) {
+    //       console.error('Error processing image:', error);
+    //       return res.status(500).send('Internal Server Error');
+    //     }
+    //   }
+    // }
 
     let Obj = []
     for (let i = 0; i < req.body.variant.size.length; i++) {

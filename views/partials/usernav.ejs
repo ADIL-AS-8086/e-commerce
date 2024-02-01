@@ -61,10 +61,10 @@
     <div class="container">
       <a class="navbar-brand" href="#"
         style="font-family: 'lalezar', sans-serif; font-weight:bold; font-size: 24px; color: #000000;">SPECMEN</a>
-        <form class="form-inline my-2 my-lg-0 ms-auto d-lg-none mx-2">
+        <form class="form-inline my-2 my-lg-0 ms-auto d-lg-none mx-2" id="searchForm" method="post" action="/user/search">
           <div class="input-group">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-dark" type="button">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="search" name="query">
+            <button class="btn btn-outline-dark" type="submit" onclick="searchProducts()">
               <i class="fa-solid fa-search"></i>
             </button>
           </div>
@@ -102,10 +102,10 @@
          
         </ul>
 
-        <form class="form-inline my-2 my-lg-0 ms-auto d-md-none d-sm-none d-lg-block">
+        <form class="form-inline my-2 my-lg-0 ms-auto d-md-none d-sm-none d-lg-block" id="searchForm" method="post" action="/user/search">
           <div class="input-group">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-dark" type="button">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="search" name="query">
+            <button class="btn btn-outline-dark" type="submit" onclick="searchProducts()">
               <i class="fa-solid fa-search"></i>
             </button>
           </div>
@@ -141,3 +141,41 @@
       
     </div>
   </nav>
+
+
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const searchForm = document.getElementById('searchForm');
+  
+      searchForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+  
+        const searchInput = document.getElementById('search');
+        const searchTerm = searchInput.value.trim();
+        console.log(searchTerm, 'searchitem');
+  
+        if (searchTerm !== '') {
+          fetch('/user/search', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `query=${encodeURIComponent(searchTerm)}`,
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+        }
+      });
+    });
+  </script>
+  
+  
+  

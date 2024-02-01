@@ -94,8 +94,12 @@
 
  
 
-  <!-- Add this div for error message -->
   <div id="error-message"></div>
+
+  <button type="submit" class="btn btn-primary" id="resendButton" onclick="resendOTP()" disabled>Resend OTP</button>
+  <span id="timer" style="margin-left: 10px;"></span>
+
+
 
   <p>By clicking Verify OTP, I agree to the <a href="#">Terms and Conditions</a>, <br> <a href="#">Privacy Policy</a>, and <a href="#">Service Management</a>.</p>
 
@@ -120,6 +124,57 @@
       errorMessage.textContent = 'Please enter a valid 4-digit OTP';
     }
   }
+
+  function startCountdown() {
+      var resendButton = document.getElementById("resendButton");
+      var timerDisplay = document.getElementById("timer");
+      var countdown = 10;
+
+      resendButton.disabled = true;
+
+      var countdownInterval = setInterval(function() {
+        countdown--;
+        timerDisplay.textContent = "Resend OTP in " + countdown + "s";
+
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          timerDisplay.textContent = "";
+          resendButton.textContent = "Resend OTP";
+          // resendButton.disabled = false;
+          resendButton.disabled = false;
+        }
+      }, 1000); // Update every 1000ms (1 second)
+    }
+
+    // Call the function when the page loads
+    window.onload = startCountdown;
+
+
+  function resendOTP() {
+    
+    // Call the server-side e ndpoint to resend OTP
+    fetch("/user/resendotp", {
+      method: "POST",
+      body: JSON.stringify({ email: "<%=email%>" }), 
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("OTP Resent successfully:", data);
+    })
+    .catch(error => {
+      console.error("Error during OTP resend:", error);
+    });
+  }
+
+
 
 </script>
 

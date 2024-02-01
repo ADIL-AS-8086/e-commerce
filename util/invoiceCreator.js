@@ -2,8 +2,16 @@ const easyinvoice = require('easyinvoice');
 const fs = require('fs');
 const path = require('path');
 
+console.log('aaaaannnnnnnnnnnnnnnnnnnnnaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+
+
 module.exports = {
     generateInvoice: async (orderDetails) => {
+        console.log("hello world$################################");
+        console.log('again checking the utility files');
+        console.log(orderDetails,';;;;;;nnnnooooottt geettting');
+    
+
         try {
             var data = {
                 
@@ -13,24 +21,24 @@ module.exports = {
     
                 "images": {
                   
-                    "logo": fs.readFileSync(path.join(__dirname, '..', 'public', 'assets', 'logoPhonebazar.png'), 'base64'),
+                    "logo": fs.readFileSync(path.join(__dirname, '..', 'public', 'assets', 'specmenlog.png'), 'base64'),
                    
     
                 },
                 "sender": {
-                    "company": "Phone Bazaar",
-                    "address": "Vellayil",
+                    "company": "SPEC MEN",
+                    "address": "ATHOLI",
                     "zip": "673001",
                     "city": "Calicut",
-                    "country": "Kerala"
+                    "country": "India"
                 },
                 "client": {
                     "company": orderDetails[0].Address.Name,
                     "address": orderDetails[0].Address.Address,
                     "zip":orderDetails[0].Address.Pincode ,
                     "city": orderDetails[0].Address.City,
-                    "state":orderDetails[0].Address.State,
-                    "Mob No": orderDetails[0].Address.Mobile
+                    "state": orderDetails[0].Address.State,
+                    "phone": orderDetails[0].Address.Mobile.toString(),
                 },
                 "information": {
                     "Order ID": orderDetails[0]._id,
@@ -40,8 +48,7 @@ module.exports = {
                 "products": (orderDetails[0].Items && orderDetails[0].Items.length > 0) ? orderDetails[0].Items.map((product) => ({
                     "quantity": product.quantity,
                     "description": product.productId.name, 
-                    "tax-rate": 18,
-                    "price": product.productId.descountedPrice
+                    "price": product.orderingprice
                 })) : [],
                 
     
@@ -61,8 +68,9 @@ module.exports = {
         }
 
             const result = await easyinvoice.createInvoice(data);
+            // console.log(result,'muhammed afsal is very dirty person');
 
-            const filePath = path.join(__dirname, '..', 'pdf', `${orderDetails[0]._id}.pdf`);
+            const filePath = path.join(__dirname, '..', 'public','pdf', `${orderDetails[0]._id}.pdf`);
             await fs.promises.writeFile(filePath, result.pdf, 'base64');
 
             return filePath;

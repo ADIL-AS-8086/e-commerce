@@ -120,4 +120,6 @@ router.post('/user/productsfilter', userAuth.verifyUser, userController.ProductF
 router.post('/user/downloadinvoice',userAuth.verifyUser,userController.generateInvoices)
 router.get('/user/downloadinvoice/:orderId',userAuth.verifyUser,userController.downloadInvoice)
 
+router.post('/user/search',userAuth.verifyUser,userController.searchproduct)
+
 module.exports = router;
